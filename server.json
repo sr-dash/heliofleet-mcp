@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.sr-dash/heliofleet-mcp",
+  "title": "HelioFleet",
+  "description": "Heliophysics spacecraft positions, alignments and solar magnetic connectivity from JPL ephemerides",
+  "version": "0.1.0",
+  "websiteUrl": "https://sr-dash.github.io/heliofleet/",
+  "repository": {
+    "url": "https://github.com/sr-dash/heliofleet-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "heliofleet-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "HELIOFLEET_SOURCE",
+          "description": "Where to read HelioFleet data: auto (site, then a local checkout), web, or local",
+          "isRequired": false,
+          "default": "auto",
+          "choices": ["auto", "web", "local"]
+        },
+        {
+          "name": "HELIOFLEET_LOCAL_DATA",
+          "description": "Path to a heliofleet/data folder for offline use",
+          "isRequired": false
+        },
+        {
+          "name": "HELIOFLEET_MCP_PLUGINS",
+          "description": "Optional tool sets: heliofield (coronal field and connectivity) or none",
+          "isRequired": false,
+          "default": "heliofield"
+        }
+      ]
+    }
+  ]
+}

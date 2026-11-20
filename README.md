@@ -1,5 +1,7 @@
 # heliofleet-mcp
 
+<!-- mcp-name: io.github.sr-dash/heliofleet-mcp -->
+
 A small [Model Context Protocol](https://modelcontextprotocol.io) server that answers
 spacecraft-geometry questions from [HelioFleet](https://sr-dash.github.io/heliofleet/)'s published
 data: where the heliophysics fleet is, what each spacecraft sees of the Sun, and when two of them
@@ -42,52 +44,58 @@ Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta s
 Common names also work, such as "Parker", "Solar Orbiter" and "STEREO-A". Times are UTC in ISO 8601
 (`2026-11-19T12:00Z`, `2026-11-19`), `now`, or a Julian date.
 
-## Install
+## Quick start
+
+With [uv](https://docs.astral.sh/uv/) installed, one command downloads and starts the server:
 
 ```bash
-git clone <this repository> heliofleet-mcp && cd heliofleet-mcp
-python3 -m venv .venv
-.venv/bin/pip install -e .
+uvx heliofleet-mcp
 ```
 
-The only runtime dependency is the `mcp` Python SDK (1.x or 2.x). The server starts with
-`.venv/bin/heliofleet-mcp` or `python -m heliofleet_mcp` and speaks MCP over stdio.
+It speaks MCP over stdio, so on its own it waits silently for a client. Register it with one:
 
-Without a clone, [uv](https://docs.astral.sh/uv/) can run it straight from a folder or a Git URL:
+**Claude Code**, for all projects:
 
 ```bash
-uvx --from /path/to/heliofleet-mcp heliofleet-mcp
+claude mcp add heliofleet --scope user -- uvx heliofleet-mcp
 ```
 
-A built wheel (`pip wheel --no-deps -w dist .`) also installs with `pip install` or `pipx install`.
-
-## Add it to an MCP client
-
-**Claude Code**, for all projects (use an absolute path):
-
-```bash
-claude mcp add heliofleet --scope user -- /absolute/path/to/heliofleet-mcp/.venv/bin/heliofleet-mcp
-```
-
-Or add it to a single project's `.mcp.json`:
+**Claude Desktop** and other MCP clients take this `mcpServers` entry. In Claude Desktop it goes in
+Settings → Developer → Edit Config, then restart the app. In a project, it can go in `.mcp.json`.
 
 ```json
 {
   "mcpServers": {
     "heliofleet": {
-      "command": "/absolute/path/to/heliofleet-mcp/.venv/bin/heliofleet-mcp"
+      "command": "uvx",
+      "args": ["heliofleet-mcp"]
     }
   }
 }
 ```
 
-**Claude Desktop**: open Settings → Developer → Edit Config, which is
-`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS and
-`%APPDATA%\Claude\claude_desktop_config.json` on Windows. Add the same `mcpServers` entry, then
-restart the app. Other MCP clients take the same command.
+Then ask, for example, "When are Parker and Solar Orbiter next radially aligned?" To work offline
+from a heliofleet checkout, add `"env": {"HELIOFLEET_SOURCE": "local", "HELIOFLEET_LOCAL_DATA":
+"/path/to/heliofleet/data"}` to the entry.
 
-To work offline from a heliofleet checkout, add `"env": {"HELIOFLEET_SOURCE": "local",
-"HELIOFLEET_LOCAL_DATA": "/path/to/heliofleet/data"}` to the entry.
+The server is also listed in the [MCP Registry](https://registry.modelcontextprotocol.io) as
+`io.github.sr-dash/heliofleet-mcp`.
+
+## Other ways to install
+
+The only runtime dependency is the `mcp` Python SDK (1.x or 2.x); Python 3.10 or newer.
+
+```bash
+pipx install heliofleet-mcp        # or: pip install heliofleet-mcp
+heliofleet-mcp                     # or: python -m heliofleet_mcp
+```
+
+From a clone, for development:
+
+```bash
+git clone https://github.com/sr-dash/heliofleet-mcp && cd heliofleet-mcp
+python3 -m venv .venv && .venv/bin/pip install -e '.[test]' jplephem
+```
 
 ## Example
 
@@ -170,6 +178,18 @@ Full methods: <https://sr-dash.github.io/heliofleet/methods.html>.
   HelioField's fleet positions and L0/B0 against HelioFleet's frames.
 
 `HELIOFLEET_TEST_SOURCE=web` runs the suite on the live sites instead of local checkouts.
+
+## Releasing
+
+1. Set the new version in `src/heliofleet_mcp/__init__.py` and in both `version` fields of
+   `server.json`, and add a section to `CHANGELOG.md`. `python scripts/check_release.py` checks
+   that they agree.
+2. Commit, push, and publish a GitHub release tagged `vX.Y.Z`.
+3. The `release` workflow then runs the tests and builds the package. It publishes to PyPI by
+   trusted publishing, attaches the files to the release, waits for PyPI, and publishes
+   `server.json` to the MCP Registry under `io.github.sr-dash/heliofleet-mcp`.
+
+The `tests` workflow validates the package and `server.json` on every push.
 
 ## Licence and citation
 

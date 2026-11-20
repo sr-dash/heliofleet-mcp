@@ -1,0 +1,106 @@
+name: release
+
+# Publishing a GitHub release tagged vX.Y.Z builds the package, publishes it to PyPI
+# (trusted publishing, no token), attaches the files to the release, and then publishes
+# server.json to the MCP Registry (GitHub OIDC, namespace io.github.sr-dash).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      registry_only:
+        description: "Skip PyPI and only publish server.json to the MCP Registry"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Tag, versions and registry metadata agree
+        run: python scripts/check_release.py ${{ github.event_name == 'release' && format('--tag {0}', github.ref_name) || '' }}
+      - run: pip install build twine -e '.[test]' jplephem
+      - run: python -m pytest -q
+        env:
+          HELIOFLEET_TEST_SOURCE: web
+      - run: python -m build
+      - run: python scripts/check_release.py --dist dist
+      - run: twine check --strict dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: build
+    if: github.event_name == 'release' || !inputs.registry_only
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/heliofleet-mcp/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  attach:
+    needs: pypi
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - run: gh release upload "${{ github.ref_name }}" dist/* --repo "${{ github.repository }}" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  registry:
+    needs: [build, pypi]
+    if: always() && needs.build.result == 'success' && (needs.pypi.result == 'success' || needs.pypi.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.9
+    steps:
+      - uses: actions/checkout@v7
+      - name: Wait until PyPI serves this version
+        run: |
+          v=$(python3 -c "import json; print(json.load(open('server.json'))['version'])")
+          for i in $(seq 1 30); do
+            if curl -fsS "https://pypi.org/pypi/heliofleet-mcp/$v/json" >/dev/null; then echo "PyPI has $v"; exit 0; fi
+            sleep 20
+          done
+          echo "PyPI does not list heliofleet-mcp $v"; exit 1
+      - uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
+      - run: scripts/get_mcp_publisher.sh
+      - run: ./mcp-publisher validate server.json
+      - run: ./mcp-publisher login github-oidc
+      - run: ./mcp-publisher publish server.json
+      - name: Registry lists this version
+        run: |
+          sleep 10
+          curl -fsS "https://registry.modelcontextprotocol.io/v0/servers?search=io.github.sr-dash/heliofleet-mcp" | python3 -c "
+          import json, sys
+          v = json.load(open('server.json'))['version']
+          data = json.load(sys.stdin)
+          found = [s['server']['version'] for s in data.get('servers', []) if s['server']['name'] == 'io.github.sr-dash/heliofleet-mcp']
+          print('registry versions:', found)
+          sys.exit(0 if v in found else 1)"
