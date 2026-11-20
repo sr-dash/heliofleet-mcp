@@ -2,6 +2,15 @@
 
 <!-- mcp-name: io.github.sr-dash/heliofleet-mcp -->
 
+[![PyPI](https://img.shields.io/pypi/v/heliofleet-mcp)](https://pypi.org/project/heliofleet-mcp/)
+[![MCP Registry](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fregistry.modelcontextprotocol.io%2Fv0%2Fservers%2Fio.github.sr-dash%252Fheliofleet-mcp%2Fversions%2Flatest&query=%24.server.version&label=MCP%20Registry&color=blue)](https://registry.modelcontextprotocol.io/v0/servers/io.github.sr-dash%2Fheliofleet-mcp/versions/latest)
+[![tests](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/tests.yml/badge.svg)](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/tests.yml)
+[![release](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/release.yml/badge.svg)](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/release.yml)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/heliofleet-mcp/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/sr-dash/heliofleet-mcp/blob/main/LICENSE)
+[![Data: HelioFleet](https://img.shields.io/badge/data-HelioFleet-orange)](https://sr-dash.github.io/heliofleet/)
+[![Data: HelioField](https://img.shields.io/badge/data-HelioField-orange)](https://sr-dash.github.io/heliofield/)
+
 A small [Model Context Protocol](https://modelcontextprotocol.io) server that answers
 spacecraft-geometry questions from [HelioFleet](https://sr-dash.github.io/heliofleet/)'s published
 data: where the heliophysics fleet is, what each spacecraft sees of the Sun, and when two of them
@@ -78,15 +87,24 @@ Then ask, for example, "When are Parker and Solar Orbiter next radially aligned?
 from a heliofleet checkout, add `"env": {"HELIOFLEET_SOURCE": "local", "HELIOFLEET_LOCAL_DATA":
 "/path/to/heliofleet/data"}` to the entry.
 
-The server is also listed in the [MCP Registry](https://registry.modelcontextprotocol.io) as
-`io.github.sr-dash/heliofleet-mcp`.
+## Where it is published
+
+| | |
+| --- | --- |
+| PyPI | [`heliofleet-mcp`](https://pypi.org/project/heliofleet-mcp/), with wheel and source archive (also attached to each [GitHub release](https://github.com/sr-dash/heliofleet-mcp/releases)) |
+| MCP Registry | [`io.github.sr-dash/heliofleet-mcp`](https://registry.modelcontextprotocol.io/v0/servers/io.github.sr-dash%2Fheliofleet-mcp/versions/latest) in the [official MCP Registry](https://registry.modelcontextprotocol.io), from which registry-aware clients and directories pick it up |
+| Source | [github.com/sr-dash/heliofleet-mcp](https://github.com/sr-dash/heliofleet-mcp) ([changelog](https://github.com/sr-dash/heliofleet-mcp/blob/main/CHANGELOG.md)) |
+
+The Registry entry ([`server.json`](https://github.com/sr-dash/heliofleet-mcp/blob/main/server.json))
+declares the PyPI package, `uvx` as the runtime, stdio transport and the optional settings
+`HELIOFLEET_SOURCE`, `HELIOFLEET_LOCAL_DATA` and `HELIOFLEET_MCP_PLUGINS`.
 
 ## Other ways to install
 
 The only runtime dependency is the `mcp` Python SDK (1.x or 2.x); Python 3.10 or newer.
 
 ```bash
-pipx install heliofleet-mcp        # or: pip install heliofleet-mcp
+pipx install heliofleet-mcp        # or: pip install heliofleet-mcp  (https://pypi.org/project/heliofleet-mcp/)
 heliofleet-mcp                     # or: python -m heliofleet_mcp
 ```
 

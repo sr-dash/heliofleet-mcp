@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- README: badges, and where the package is published (PyPI, MCP Registry, GitHub releases).
+- Package classifiers for Python 3.10 to 3.13.
+
 ## 0.1.0 (2026-11-20)
 
 First release.
