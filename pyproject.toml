@@ -11,6 +11,13 @@ license = "MIT"
 authors = [{ name = "Soumyaranjan Dash" }]
 requires-python = ">=3.10"
 dependencies = ["mcp>=1.2"]
+keywords = ["heliophysics", "spacecraft", "ephemeris", "solar", "mcp", "sunpy", "pfss"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Astronomy",
+  "Operating System :: OS Independent",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=7", "sunpy>=6", "astropy>=6"]
@@ -20,6 +27,7 @@ heliofleet-mcp = "heliofleet_mcp.server:main"
 
 [project.urls]
 HelioFleet = "https://sr-dash.github.io/heliofleet/"
+HelioField = "https://sr-dash.github.io/heliofield/"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, Literal
 
 try:  # mcp >= 2
@@ -20,7 +21,9 @@ MAVEN) and the inner planets, from HelioFleet's JPL Horizons ephemerides (2010 t
 Times are UTC (ISO 8601, e.g. 2026-11-19T12:00Z, or 'now'). Body keys: earth, sdo, soho, aditya,
 ace, wind, dscovr, imap, swfo, cgo, solo, psp, bepi, sta, stb, maven, mercury, venus, mars
 (common names such as 'Parker' or 'Solar Orbiter' also work). Every result carries a HelioFleet
-link that reproduces the view in the browser; give it to the user with the numbers."""
+link that reproduces the view in the browser; give it to the user with the numbers.
+With the HelioField plugin (on by default), magnetic_connection, space_weather, coronal_field and
+heliofield_link add the PFSS coronal field and magnetic connectivity from HelioField's daily products."""
 
 mcp = _Server("heliofleet", instructions=INSTRUCTIONS)
 fleet = Fleet()
@@ -123,6 +126,25 @@ def data_status() -> dict[str, Any]:
             "bodies": {k: {"start_utc": iso(v["start"]), "end_utc": iso(v["end"]), "step_days": v["step"],
                            "units": v["units"], "center": v["center"]} for k, v in m["bodies"].items()},
             "link": "https://sr-dash.github.io/heliofleet/methods.html"}
+
+
+def _load_plugins() -> list[str]:
+    """Optional tool sets, chosen with HELIOFLEET_MCP_PLUGINS (comma list; default 'heliofield'; 'none')."""
+    names = [n.strip() for n in os.environ.get("HELIOFLEET_MCP_PLUGINS", "heliofield").split(",") if n.strip()]
+    loaded = []
+    for name in names:
+        if name == "none":
+            return []
+        if name == "heliofield":
+            from . import heliofield
+            heliofield.register(mcp)
+            loaded.append(name)
+        else:
+            raise SystemExit(f"unknown plugin {name!r} (available: heliofield)")
+    return loaded
+
+
+PLUGINS = _load_plugins()
 
 
 def main() -> None:

@@ -1,0 +1,23 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 7 2 * *"  # the day after HelioFleet's monthly data update
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[test]' jplephem
+      - run: python -m pytest -q
+        env:
+          HELIOFLEET_TEST_SOURCE: web

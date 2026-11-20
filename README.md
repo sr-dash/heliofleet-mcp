@@ -21,6 +21,23 @@ Every answer carries a HelioFleet link that reproduces the view in the browser.
 | `heliofleet_link(...)` | A map or sky-view URL for a time, frame, zoom, hidden bodies, surface spot, tab or alignment search |
 | `data_status()` | Which data release is loaded, where it came from, and each body's span |
 
+### HelioField plugin (on by default)
+
+These tools add the coronal magnetic field from [HelioField](https://sr-dash.github.io/heliofield/)'s
+daily PFSS products. They read published files and do not solve the field.
+
+| Tool | What it returns |
+| --- | --- |
+| `magnetic_connection(body, date, solar_wind_km_s)` | Where Earth, the L1 fleet, Parker, Solar Orbiter, BepiColombo or STEREO-A connects to the Sun: the Parker-spiral point on the source surface, the PFSS footpoint (Carrington), the expansion factor, distance to the coronal-hole boundary and a WSA-type speed. `self_consistent=True` uses each body's own speed estimate |
+| `space_weather(date)` | Model wind speed and sector at Earth, the next sector boundary, a −1 to +7 day outlook, an alert level, and that day's solar wind measured at L1 |
+| `coronal_field(date)` | Magnetogram, PFSS settings, open flux and Earth's L0/B0, plus solar-cycle context per Carrington rotation (open flux and area, current-sheet tilt, polar fields; any date since 2010) |
+| `heliofield_link(...)` | A link to the 3D corona, connectivity, space-weather or observations page |
+
+Daily products cover about the last two months. For older dates the tools return links, because the
+HelioField page computes any date since 2010-05-01 in the browser. HelioField's Carrington positions
+of the fleet agree with HelioFleet's to 0.002°, and a test checks this. Set
+`HELIOFLEET_MCP_PLUGINS=none` to serve the HelioFleet tools alone.
+
 Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury venus mars`.
 Common names also work, such as "Parker", "Solar Orbiter" and "STEREO-A". Times are UTC in ISO 8601
 (`2026-11-19T12:00Z`, `2026-11-19`), `now`, or a Julian date.
@@ -35,6 +52,14 @@ python3 -m venv .venv
 
 The only runtime dependency is the `mcp` Python SDK (1.x or 2.x). The server starts with
 `.venv/bin/heliofleet-mcp` or `python -m heliofleet_mcp` and speaks MCP over stdio.
+
+Without a clone, [uv](https://docs.astral.sh/uv/) can run it straight from a folder or a Git URL:
+
+```bash
+uvx --from /path/to/heliofleet-mcp heliofleet-mcp
+```
+
+A built wheel (`pip wheel --no-deps -w dist .`) also installs with `pip install` or `pipx install`.
 
 ## Add it to an MCP client
 
@@ -101,6 +126,12 @@ folder is found automatically.
 | `HELIOFLEET_LOCAL_DATA` | sibling `heliofleet/data` | local data folder |
 | `HELIOFLEET_CACHE` | `~/.cache/heliofleet-mcp` | cache folder |
 | `HELIOFLEET_SITE` | `https://sr-dash.github.io/heliofleet/` | site root |
+| `HELIOFLEET_MCP_PLUGINS` | `heliofield` | optional tool sets, or `none` |
+| `HELIOFIELD_SITE` | `https://sr-dash.github.io/heliofield/` | HelioField site root |
+| `HELIOFIELD_LOCAL` | sibling `heliofield` | local HelioField checkout |
+
+HelioField files go in the same cache. Dated products are kept for good, and the index and series
+files are refreshed hourly.
 
 ## Methods
 
@@ -135,9 +166,14 @@ Full methods: <https://sr-dash.github.io/heliofleet/methods.html>.
   against Horizons.
 - `test_server_stdio.py`: the server started over stdio and called through the MCP client.
 - `test_data_sources.py`: site fetch and cache (marked `network`), and the local fallback.
+- `test_heliofield.py`: the plugin's daily products, links as in HelioField's `llms.txt`, and
+  HelioField's fleet positions and L0/B0 against HelioFleet's frames.
+
+`HELIOFLEET_TEST_SOURCE=web` runs the suite on the live sites instead of local checkouts.
 
 ## Licence and citation
 
 MIT. When you use positions from this server, please cite HelioFleet: Dash, S. (2026). *HelioFleet:
 an interactive map of heliophysics spacecraft positions* [Computer software]. Zenodo.
-<https://doi.org/10.5281/zenodo.23328187>. Ephemerides: JPL Horizons.
+<https://doi.org/10.5281/zenodo.23328187>. Ephemerides: JPL Horizons. For coronal-field results,
+cite HelioField (<https://doi.org/10.5281/zenodo.23487231>) and the magnetogram (NSO/GONG or SDO/HMI).
