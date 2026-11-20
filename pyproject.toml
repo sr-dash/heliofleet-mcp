@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "heliofleet-mcp"
+version = "0.1.0"
+description = "MCP server for heliophysics spacecraft geometry from HelioFleet's published ephemerides"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Soumyaranjan Dash" }]
+requires-python = ">=3.10"
+dependencies = ["mcp>=1.2"]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "sunpy>=6", "astropy>=6"]
+
+[project.scripts]
+heliofleet-mcp = "heliofleet_mcp.server:main"
+
+[project.urls]
+HelioFleet = "https://sr-dash.github.io/heliofleet/"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["network: needs internet access (HelioFleet site or JPL Horizons)"]
