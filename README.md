@@ -155,7 +155,8 @@ The methods return the same dictionaries as the MCP tools. `Fleet` and `HelioFie
 `Store` or `FieldStore` for a different source, cache or offline checkout.
 
 The [API reference](https://sr-dash.github.io/heliofleet-mcp/) documents every public class and function, with parameters, return
-values and examples (numpydoc docstrings, built with pdoc). The examples run as doctests in CI.
+values and examples (numpydoc docstrings, built with MkDocs Material and mkdocstrings). The examples
+run as doctests in CI.
 
 ## For assistants
 

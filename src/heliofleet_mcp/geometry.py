@@ -42,7 +42,7 @@ class Fleet:
     Parameters
     ----------
     store : Store, optional
-        The data source. Default: a new :class:`heliofleet_mcp.data.Store` (the site, with cache
+        The data source. Default: a new [`Store`][heliofleet_mcp.data.Store] (the site, with cache
         and local fallbacks).
 
     Examples
@@ -116,7 +116,7 @@ class Fleet:
         jd : float
             Julian date (UT).
         p : tuple of float or None
-            Its position from :meth:`helio`.
+            Its position from [`helio()`][heliofleet_mcp.geometry.Fleet.helio].
 
         Returns
         -------
@@ -156,9 +156,9 @@ class Fleet:
         Returns
         -------
         tuple
-            ``(status, position)``: the status as in :meth:`status` (``ok`` for planets) and the
-            ecliptic J2000 position in au, or None when there is nothing to show. ``approx``
-            bodies are placed at Earth.
+            ``(status, position)``: the status as in [`status()`][heliofleet_mcp.geometry.Fleet.status]
+            (``ok`` for planets) and the ecliptic J2000 position in au, or None when there is nothing
+            to show. ``approx`` bodies are placed at Earth.
 
         Examples
         --------
@@ -241,15 +241,15 @@ class Fleet:
         body : str
             Body key or name (``psp``, ``Parker``, ``Solar Orbiter``, ``earth``, ``mars``, ...).
         time : str or float, optional
-            UTC time in any form :func:`heliofleet_mcp.timeutil.parse_time` accepts. Default: now.
+            UTC time in any form [`parse_time()`][heliofleet_mcp.timeutil.parse_time] accepts. Default: now.
         wind : float, optional
             Solar-wind speed for the Parker-spiral footpoint (km/s).
 
         Returns
         -------
         dict
-            The coordinate row of :meth:`body_row`, a ``note`` when the body has no position or
-            is shown at Earth, and a HelioFleet ``link``.
+            The coordinate row of [`body_row()`][heliofleet_mcp.geometry.Fleet.body_row], a ``note``
+            when the body has no position or is shown at Earth, and a HelioFleet ``link``.
 
         Raises
         ------
@@ -291,8 +291,8 @@ class Fleet:
         -------
         dict
             ``time_utc``, ``frame_notes``, ``solar_wind_km_s``, ``bodies`` (rows as in
-            :meth:`body_row`), ``not_shown`` (bodies without a position and why), ``link`` and
-            ``data`` (the loaded release).
+            [`body_row()`][heliofleet_mcp.geometry.Fleet.body_row]), ``not_shown`` (bodies without a
+            position and why), ``link`` and ``data`` (the loaded release).
 
         Examples
         --------
@@ -565,8 +565,9 @@ class Fleet:
         """HelioFleet's event calendar between two times (the ``list_upcoming_events`` tool).
 
         The calendar is rebuilt with each monthly data release and lists events from 30 days
-        before that build to the end of the ephemerides; use :meth:`find_alignments` for past
-        dates, other pairs or other tolerances.
+        before that build to the end of the ephemerides; use
+        [`find_alignments()`][heliofleet_mcp.geometry.Fleet.find_alignments] for past dates, other
+        pairs or other tolerances.
 
         Parameters
         ----------
@@ -707,8 +708,9 @@ class Fleet:
         Returns
         -------
         dict
-            :meth:`data_info`, ``bodies`` (per series: ``start_utc``, ``end_utc``, ``step_days``,
-            ``units``, ``center``) and a link to the methods page.
+            [`data_info()`][heliofleet_mcp.geometry.Fleet.data_info], ``bodies`` (per series:
+            ``start_utc``, ``end_utc``, ``step_days``, ``units``, ``center``) and a link to the
+            methods page.
 
         Examples
         --------

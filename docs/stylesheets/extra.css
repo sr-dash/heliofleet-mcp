@@ -1,0 +1,102 @@
+/* HelioFleet palette: navy with solar amber */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #1b2540;
+  --md-primary-fg-color--light: #2c3a5e;
+  --md-primary-fg-color--dark: #111829;
+  --md-accent-fg-color: #d97706;
+  --md-accent-fg-color--transparent: rgba(217, 119, 6, 0.1);
+  --hf-hero-from: #1b2540;
+  --hf-hero-to: #3b2a1a;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #121a2e;
+  --md-primary-fg-color--light: #1b2540;
+  --md-primary-fg-color--dark: #0b1020;
+  --md-accent-fg-color: #fbbf24;
+  --md-accent-fg-color--transparent: rgba(251, 191, 36, 0.1);
+  --md-default-bg-color: #0f1626;
+  --md-code-bg-color: #172036;
+  --hf-hero-from: #0b1020;
+  --hf-hero-to: #2a1d10;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:not(.md-button) {
+  color: #fcd34d;
+}
+.md-typeset .hf-hero a:not(.md-button) {
+  color: #fcd34d;
+}
+
+/* Hero on the home page */
+.hf-hero {
+  margin: 0 0 1.6rem;
+  padding: 2rem 1.6rem 1.8rem;
+  border-radius: 0.8rem;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 88% 20%, rgba(251, 191, 36, 0.45), transparent 32%),
+    linear-gradient(135deg, var(--hf-hero-from), var(--hf-hero-to));
+}
+.hf-hero h1 {
+  margin: 0 0 0.4rem;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.hf-hero p {
+  margin: 0.2rem 0 1rem;
+  max-width: 40rem;
+  color: #e2e8f0;
+  font-size: 0.86rem;
+}
+.md-typeset .hf-hero .md-button {
+  margin: 0.3rem 0.4rem 0 0;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.md-typeset .hf-hero .md-button--primary {
+  color: #1b2540;
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+}
+.md-typeset .hf-hero .md-button:hover {
+  color: #1b2540;
+  background-color: #fde68a;
+  border-color: #fde68a;
+}
+.hf-hero code {
+  color: #fde68a;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+/* Home page: no edit pencil over the hero; the four cards as a 2 x 2 grid */
+.md-content__inner > .md-content__button:has(~ .hf-hero) {
+  display: none;
+}
+@media screen and (min-width: 45em) {
+  .md-typeset .grid.cards.hf-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Cards */
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid > .card {
+  border-radius: 0.6rem;
+}
+
+/* The demo animation */
+.hf-demo img {
+  border-radius: 0.6rem;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.25);
+}
+
+/* API pages: a little more air around each object */
+.doc-object + .doc-object {
+  margin-top: 2rem;
+}
+.md-typeset .doc-heading code {
+  font-weight: 600;
+}

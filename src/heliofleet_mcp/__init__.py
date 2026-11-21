@@ -9,16 +9,16 @@ Main classes
 ------------
 Fleet
     Positions, viewing geometry, alignment search and the event calendar
-    (:mod:`heliofleet_mcp.geometry`).
+    ([`heliofleet_mcp.geometry`][heliofleet_mcp.geometry]).
 HelioField
     PFSS magnetic connectivity, space-weather indicators and the coronal-field summary
-    (:mod:`heliofleet_mcp.heliofield`).
+    ([`heliofleet_mcp.heliofield`][heliofleet_mcp.heliofield]).
 Store, FieldStore
     The data sources: the sites, with a disk cache and a local-checkout fallback.
 
-Lower-level modules: :mod:`heliofleet_mcp.frames` (solar coordinate frames),
-:mod:`heliofleet_mcp.timeutil` (time parsing), :mod:`heliofleet_mcp.links` (page links) and
-:mod:`heliofleet_mcp.catalog` (bodies and names).
+Lower-level modules: [`frames`][heliofleet_mcp.frames] (solar coordinate frames),
+[`timeutil`][heliofleet_mcp.timeutil] (time parsing), [`links`][heliofleet_mcp.links] (page links)
+and [`catalog`][heliofleet_mcp.catalog] (bodies and names).
 
 Examples
 --------

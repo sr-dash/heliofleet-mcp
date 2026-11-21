@@ -53,7 +53,7 @@ classifiers = [
 [project.optional-dependencies]
 test = ["pytest>=7", "pytest-cov>=5", "sunpy>=6", "astropy>=6"]
 lint = ["ruff>=0.6"]
-docs = ["pdoc>=14"]
+docs = ["mkdocs>=1.6", "mkdocs-material>=9.5", "mkdocstrings[python]>=0.26"]
 
 [project.scripts]
 heliofleet-mcp = "heliofleet_mcp.cli:main"

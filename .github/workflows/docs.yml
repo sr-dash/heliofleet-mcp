@@ -1,10 +1,11 @@
 name: docs
 
-# API reference from the numpydoc docstrings, published on GitHub Pages
+# Documentation site (MkDocs Material, API pages from the numpydoc docstrings), on GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ["src/**", "pyproject.toml", ".github/workflows/docs.yml"]
+    paths: ["src/**", "docs/**", "overrides/**", "mkdocs.yml", "pyproject.toml", "llms.txt",
+            "CHANGELOG.md", ".github/workflows/docs.yml"]
   # Not on release: the github-pages environment deploys from main only, and a release's version
   # bump has already been pushed to main.
   workflow_dispatch:
@@ -24,16 +25,13 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
-      - run: pip install . pdoc
-      - name: Build the API reference
-        run: |
-          version=$(python -c "import heliofleet_mcp; print(heliofleet_mcp.__version__)")
-          pdoc -d numpy -o site \
-            --footer-text "heliofleet-mcp $version" \
-            --edit-url heliofleet_mcp=https://github.com/sr-dash/heliofleet-mcp/blob/main/src/heliofleet_mcp/ \
-            heliofleet_mcp heliofleet_mcp.geometry heliofleet_mcp.heliofield heliofleet_mcp.data \
-            heliofleet_mcp.frames heliofleet_mcp.timeutil heliofleet_mcp.links heliofleet_mcp.catalog \
-            heliofleet_mcp.cli heliofleet_mcp.server
+      - run: pip install ".[docs]"
+      - name: Publish llms.txt with the site
+        run: cp llms.txt docs/llms.txt
+      - name: Build (strict: broken links and references fail the build)
+        run: mkdocs build --strict
+        env:
+          NO_MKDOCS_2_WARNING: "1"
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site

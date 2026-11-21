@@ -56,7 +56,7 @@ class FieldStore:
     Parameters
     ----------
     source : {'auto', 'web', 'local'}, optional
-        As for :class:`heliofleet_mcp.data.Store`. Default: ``HELIOFLEET_SOURCE``, else ``auto``.
+        As for [`Store`][heliofleet_mcp.data.Store]. Default: ``HELIOFLEET_SOURCE``, else ``auto``.
     local : str or pathlib.Path, optional
         A heliofield checkout. Default: ``HELIOFIELD_LOCAL``, else a sibling ``heliofield`` folder.
     cache : str or pathlib.Path, optional
@@ -232,7 +232,7 @@ class HelioField:
     Parameters
     ----------
     store : FieldStore, optional
-        The data source. Default: a new :class:`FieldStore`.
+        The data source. Default: a new [`FieldStore`][heliofleet_mcp.heliofield.FieldStore].
 
     Examples
     --------
@@ -295,7 +295,7 @@ class HelioField:
             Body key or name (``earth``, ``psp``, ``solo``, ``bepi``, ``sta``, the L1 fleet), or
             ``all`` (default).
         date : str, optional
-            ``YYYY-MM-DD``, any time :func:`heliofleet_mcp.timeutil.parse_time` accepts, or
+            ``YYYY-MM-DD``, any time [`parse_time()`][heliofleet_mcp.timeutil.parse_time] accepts, or
             ``latest`` (default).
         solar_wind_km_s : float, optional
             Wind speed for the spiral; the nearest speed of the product's grid is used.

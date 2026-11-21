@@ -9,3 +9,5 @@ mcp-publisher
 .mcpregistry_*
 .coverage
 coverage.xml
+docs/llms.txt
+site/

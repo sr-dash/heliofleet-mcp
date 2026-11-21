@@ -38,7 +38,7 @@ requests are not merged when they:
 git clone https://github.com/sr-dash/heliofleet-mcp
 cd heliofleet-mcp
 python3 -m venv .venv
-.venv/bin/pip install -e '.[test,lint]' jplephem
+.venv/bin/pip install -e '.[test,lint,docs]' jplephem
 ```
 
 Run the tests and the lint check before opening a pull request:
@@ -60,7 +60,8 @@ does. CI runs them on Linux (Python 3.10 to 3.14), macOS and Windows.
 - Public functions, classes and methods get a numpydoc docstring with Parameters, Returns and
   Examples sections; ruff checks the format and `tests/test_docstrings.py` checks the sections.
   Examples run as doctests, so give them stable output (fixed past dates, rounded numbers). The
-  [API reference](https://sr-dash.github.io/heliofleet-mcp/) is built from these docstrings by the `docs` workflow.
+  [API reference](https://sr-dash.github.io/heliofleet-mcp/) is built from these docstrings and the pages in `docs/`
+  by the `docs` workflow (MkDocs Material); preview it with `mkdocs serve`.
 - The docstrings of the MCP tools (in `server.py` and `heliofield.register`) are the descriptions
   MCP clients show; keep them as plain prose for clients, not numpydoc.
 - Times are UTC; angles are degrees; distances are au unless the name says otherwise.

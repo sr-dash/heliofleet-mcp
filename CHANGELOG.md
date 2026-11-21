@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- The documentation site (https://sr-dash.github.io/heliofleet-mcp/) moves from pdoc to MkDocs
+  Material: getting started, MCP tools, command line, Python, methods, and an API reference built
+  from the docstrings with mkdocstrings. Page descriptions, Open Graph and Twitter cards,
+  structured data, sitemap and robots.txt for search engines.
+
 ## 0.2.0 (2026-11-20)
 
 - API reference at https://sr-dash.github.io/heliofleet-mcp/, built from the docstrings with pdoc and published on GitHub Pages.

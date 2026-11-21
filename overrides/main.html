@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{#- Discoverability: Search Console, keywords, Open Graph, Twitter cards, llms.txt and JSON-LD.
+    Material already writes the title, description, canonical URL, author, sitemap and analytics. -#}
+{% block extrahead %}
+  {%- set desc = page.meta.description if page and page.meta and page.meta.description else config.site_description -%}
+  {%- set ptitle = (page.title ~ " · " ~ config.site_name) if page and page.title and not page.is_homepage else config.site_name ~ ": heliophysics spacecraft geometry" -%}
+  {%- set purl = page.canonical_url if page and page.canonical_url else config.site_url -%}
+  {%- set img = config.site_url ~ "social-preview.png" -%}
+  <meta name="google-site-verification" content="{{ config.extra.google_site_verification }}">
+  <meta name="keywords" content="{{ config.extra.keywords }}">
+  <meta name="theme-color" content="#1b2540">
+  <link rel="alternate" type="text/plain" title="llms.txt" href="{{ config.site_url }}llms.txt">
+  <meta property="og:type" content="{{ 'website' if page and page.is_homepage else 'article' }}">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="{{ ptitle }}">
+  <meta property="og:description" content="{{ desc }}">
+  <meta property="og:url" content="{{ purl }}">
+  <meta property="og:image" content="{{ img }}">
+  <meta property="og:image:secure_url" content="{{ img }}">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="heliofleet-mcp: the HelioFleet map with Parker Solar Probe and Solar Orbiter on one radial from the Sun, and the command uvx heliofleet-mcp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ ptitle }}">
+  <meta name="twitter:description" content="{{ desc }}">
+  <meta name="twitter:image" content="{{ img }}">
+  <meta name="twitter:image:alt" content="heliofleet-mcp: Parker Solar Probe and Solar Orbiter on one radial from the Sun">
+  {%- if page and page.is_homepage %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "{{ config.site_url }}#software",
+        "name": "heliofleet-mcp",
+        "description": "{{ config.site_description }}",
+        "url": "{{ config.site_url }}",
+        "codeRepository": "{{ config.repo_url }}",
+        "programmingLanguage": {"@type": "ComputerLanguage", "name": "Python"},
+        "runtimePlatform": "Python 3.10+",
+        "license": "https://opensource.org/licenses/MIT",
+        "identifier": "https://doi.org/10.5281/zenodo.24409982",
+        "sameAs": [
+          "https://doi.org/10.5281/zenodo.24409982",
+          "https://pypi.org/project/heliofleet-mcp/",
+          "https://github.com/sr-dash/heliofleet-mcp"
+        ],
+        "keywords": "{{ config.extra.keywords }}",
+        "isBasedOn": [
+          {"@type": "SoftwareApplication", "name": "HelioFleet", "url": "https://sr-dash.github.io/heliofleet/", "identifier": "https://doi.org/10.5281/zenodo.23328187"},
+          {"@type": "SoftwareApplication", "name": "HelioField", "url": "https://sr-dash.github.io/heliofield/", "identifier": "https://doi.org/10.5281/zenodo.23487231"}
+        ],
+        "author": {
+          "@type": "Person",
+          "name": "Soumyaranjan Dash",
+          "url": "https://sr-dash.github.io/",
+          "identifier": "https://orcid.org/0000-0003-0103-6569",
+          "affiliation": {"@type": "Organization", "name": "National Solar Observatory"}
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "{{ config.site_url }}#application",
+        "name": "heliofleet-mcp",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "Heliophysics, MCP server",
+        "operatingSystem": "Linux, macOS, Windows",
+        "description": "{{ config.site_description }}",
+        "url": "{{ config.site_url }}",
+        "downloadUrl": "https://pypi.org/project/heliofleet-mcp/",
+        "installUrl": "https://pypi.org/project/heliofleet-mcp/",
+        "screenshot": "{{ img }}",
+        "image": "{{ img }}",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "author": {"@id": "{{ config.site_url }}#software"}
+      },
+      {
+        "@type": "WebSite",
+        "@id": "{{ config.site_url }}#website",
+        "name": "{{ config.site_name }}",
+        "url": "{{ config.site_url }}",
+        "inLanguage": "en"
+      }
+    ]
+  }
+  </script>
+  {%- else %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": {{ ptitle | tojson }},
+    "description": {{ desc | tojson }},
+    "url": "{{ purl }}",
+    "image": "{{ img }}",
+    "inLanguage": "en",
+    "isPartOf": {"@type": "WebSite", "name": "{{ config.site_name }}", "url": "{{ config.site_url }}"},
+    "about": {"@type": "SoftwareSourceCode", "name": "heliofleet-mcp", "codeRepository": "{{ config.repo_url }}"},
+    "author": {"@type": "Person", "name": "Soumyaranjan Dash", "url": "https://sr-dash.github.io/"}
+  }
+  </script>
+  {%- endif %}
+{% endblock %}
