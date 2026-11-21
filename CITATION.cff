@@ -9,6 +9,7 @@ authors:
     affiliation: "National Solar Observatory"
 version: 0.1.1
 date-released: 2026-11-20
+doi: 10.5281/zenodo.24409982
 url: "https://pypi.org/project/heliofleet-mcp/"
 repository-code: "https://github.com/sr-dash/heliofleet-mcp"
 license: MIT

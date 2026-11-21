@@ -40,5 +40,5 @@ HelioField().magnetic_connection("psp")
 
 ## Citation
 
-- This package: see [CITATION.cff](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff).
+- This package: https://doi.org/10.5281/zenodo.24409982 (latest release); see [CITATION.cff](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff).
 - HelioFleet: https://doi.org/10.5281/zenodo.23328187. HelioField: https://doi.org/10.5281/zenodo.23487231.

@@ -86,7 +86,7 @@ Alignment kinds:
 
 Cite HelioFleet (https://doi.org/10.5281/zenodo.23328187) for positions and geometry. Cite
 HelioField (https://doi.org/10.5281/zenodo.23487231) and the magnetogram (NSO/GONG or SDO/HMI) for
-coronal-field results. See `CITATION.cff` for this package.
+coronal-field results. Cite this package as https://doi.org/10.5281/zenodo.24409982 (see `CITATION.cff`).
 
 ## Working on the code
 

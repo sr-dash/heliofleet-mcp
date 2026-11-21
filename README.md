@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/sr-dash/heliofleet-mcp/blob/main/LICENSE)
 [![Data: HelioFleet](https://img.shields.io/badge/data-HelioFleet-orange)](https://sr-dash.github.io/heliofleet/)
 [![Data: HelioField](https://img.shields.io/badge/data-HelioField-orange)](https://sr-dash.github.io/heliofield/)
-[![DOI](https://zenodo.org/badge/1464806835.svg)](https://zenodo.org/badge/latestdoi/1464806835)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24409982.svg)](https://doi.org/10.5281/zenodo.24409982)
 
 A small [Model Context Protocol](https://modelcontextprotocol.io) server that answers
 spacecraft-geometry questions from [HelioFleet](https://sr-dash.github.io/heliofleet/)'s published
@@ -257,8 +257,11 @@ The `tests` workflow validates the package and `server.json` on every push.
 
 ## Licence and citation
 
-MIT. To cite this package, use [`CITATION.cff`](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff)
-or the Zenodo DOI in the badge above, which resolves to the latest release. When you use positions,
+MIT. To cite this package: Dash, S. (2026). *heliofleet-mcp: spacecraft geometry and solar magnetic
+connectivity from HelioFleet and HelioField data* [Computer software]. Zenodo. <https://doi.org/10.5281/zenodo.24409982>.
+That DOI resolves to the latest release; [10.5281/zenodo.24409983](https://doi.org/10.5281/zenodo.24409983) is version 0.1.1.
+[`CITATION.cff`](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff) drives GitHub's
+**Cite this repository** button. When you use positions,
 please also cite HelioFleet: Dash, S. (2026). *HelioFleet:
 an interactive map of heliophysics spacecraft positions* [Computer software]. Zenodo.
 <https://doi.org/10.5281/zenodo.23328187>. Ephemerides: JPL Horizons. For coronal-field results,
