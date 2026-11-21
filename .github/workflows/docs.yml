@@ -5,8 +5,8 @@ on:
   push:
     branches: [main]
     paths: ["src/**", "pyproject.toml", ".github/workflows/docs.yml"]
-  release:
-    types: [published]
+  # Not on release: the github-pages environment deploys from main only, and a release's version
+  # bump has already been pushed to main.
   workflow_dispatch:
 
 permissions:
