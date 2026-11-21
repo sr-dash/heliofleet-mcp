@@ -261,7 +261,8 @@ The `tests` workflow validates the package and `server.json` on every push.
 
 MIT. To cite this package: Dash, S. (2026). *heliofleet-mcp: spacecraft geometry and solar magnetic
 connectivity from HelioFleet and HelioField data* [Computer software]. Zenodo. <https://doi.org/10.5281/zenodo.24409982>.
-That DOI resolves to the latest release; [10.5281/zenodo.24409983](https://doi.org/10.5281/zenodo.24409983) is version 0.1.1.
+That DOI resolves to the latest release; [10.5281/zenodo.24411004](https://doi.org/10.5281/zenodo.24411004) is version 0.1.2
+and [10.5281/zenodo.24409983](https://doi.org/10.5281/zenodo.24409983) is version 0.1.1.
 [`CITATION.cff`](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff) drives GitHub's
 **Cite this repository** button. When you use positions,
 please also cite HelioFleet: Dash, S. (2026). *HelioFleet:
