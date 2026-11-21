@@ -75,7 +75,14 @@ def main() -> int:
             bad.append(f"{f} is missing")
 
     # Skill and plugin manifests: same name and version as the package
-    for f in (".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", "plugin.json"):
+    # The directory edition (plugins/heliofleet, submitted on its own) carries the same skill files
+    canon, copy = ROOT / "skills/heliofleet", ROOT / "plugins/heliofleet/skills/heliofleet"
+    files = sorted(p.relative_to(canon) for p in canon.rglob("*") if p.is_file())
+    if files != sorted(p.relative_to(copy) for p in copy.rglob("*") if p.is_file()) or any(
+            (canon / f).read_bytes() != (copy / f).read_bytes() for f in files):
+        bad.append("plugins/heliofleet/skills/heliofleet differs from skills/heliofleet (copy it again)")
+    for f in (".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", "plugin.json",
+              "plugins/heliofleet/.claude-plugin/plugin.json"):
         m = json.loads((ROOT / f).read_text())
         if m.get("name") != "heliofleet":
             bad.append(f"{f} name {m.get('name')!r} != 'heliofleet'")

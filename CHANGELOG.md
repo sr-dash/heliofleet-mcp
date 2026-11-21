@@ -7,6 +7,9 @@
 - Plugins: `.claude-plugin/` (plugin and marketplace; skill plus the MCP server from `.mcp.json`),
   `.cursor-plugin/plugin.json`, and an Agent Plugins `plugin.json` (skill only). CI validates the
   skill and the Agent Plugins manifest; `check_release.py` keeps their names and versions in step.
+- `plugins/heliofleet/`: a skill-only plugin edition for directories that accept only documentation
+  files (no local MCP server, no install commands); the skill calls the installed `heliofleet-mcp`
+  command and points to the install guide when it is missing.
 - The `list_upcoming_events` tool description gives HelioFleet's current DONKI thresholds (M1+
   flares, CMEs from 500 km/s, G1+ storms).
 - The documentation site (https://sr-dash.github.io/heliofleet-mcp/) moves from pdoc to MkDocs

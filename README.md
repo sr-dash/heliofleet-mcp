@@ -170,8 +170,8 @@ Stonyhurst sign, the alignment sampling and model caveats.
 
 [`skills/heliofleet/SKILL.md`](https://github.com/sr-dash/heliofleet-mcp/blob/main/skills/heliofleet/SKILL.md)
 is an [Agent Skill](https://agentskills.io): it teaches an assistant which `heliofleet-mcp` command
-answers which question and how to report the result. It needs only a shell with `uvx` (or the
-package installed), no MCP set-up, and works in any assistant that reads Agent Skills.
+answers which question and how to report the result. It needs only a shell and the installed
+`heliofleet-mcp` command, no MCP set-up, and works in any assistant that reads Agent Skills.
 
 | Where | Install |
 | --- | --- |
@@ -182,7 +182,8 @@ package installed), no MCP set-up, and works in any assistant that reads Agent S
 
 The plugin manifests are `.claude-plugin/` (with `marketplace.json`, so this repository is its own
 marketplace), `.cursor-plugin/plugin.json`, and the [Agent Plugins](https://agent-plugins.org)
-`plugin.json` at the root. CI validates the skill and the Agent Plugins manifest on each push.
+`plugin.json` at the root. `plugins/heliofleet/` is a skill-only edition for plugin directories that
+accept only documentation files. CI validates the skill and the Agent Plugins manifest on each push.
 
 ## Example
 

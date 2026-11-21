@@ -12,13 +12,13 @@ description: >-
   command line, which prints JSON with a HelioFleet or HelioField link for every answer.
 license: MIT
 compatibility: >-
-  Needs Python 3.10+ with uv (for uvx) or pip, and internet access to sr-dash.github.io, or a local
-  HelioFleet checkout set with HELIOFLEET_LOCAL_DATA.
+  Needs the heliofleet-mcp command (a Python 3.10+ package; install guide at
+  https://sr-dash.github.io/heliofleet-mcp/getting-started/) and internet access to sr-dash.github.io,
+  or a local HelioFleet checkout set with HELIOFLEET_LOCAL_DATA.
 metadata:
   author: Soumyaranjan Dash
   homepage: https://sr-dash.github.io/heliofleet-mcp/
   repository: https://github.com/sr-dash/heliofleet-mcp
-allowed-tools: Bash(uvx heliofleet-mcp:*) Bash(heliofleet-mcp:*)
 ---
 
 # HelioFleet: heliophysics spacecraft geometry
@@ -30,11 +30,11 @@ view. Report the numbers and give the user the link.
 ## Running it
 
 ```bash
-uvx heliofleet-mcp <command> [options] --compact
+heliofleet-mcp <command> [options] --compact
 ```
 
-- `uvx` downloads and caches the package on first use (a few seconds). Without uv:
-  `pip install heliofleet-mcp`, then run `heliofleet-mcp <command> ...` the same way.
+- If the command is not found, the package is not installed. Point the user to the install guide,
+  https://sr-dash.github.io/heliofleet-mcp/getting-started/, and continue once it is installed.
 - If the heliofleet MCP tools are already available in this session (`find_alignments`,
   `get_position`, ...), call those instead: they return the same JSON.
 - Errors print `{"error": ..., "type": ...}` on stderr with exit status 2. Read the message, fix the
@@ -98,7 +98,7 @@ User: "When are Parker Solar Probe and Solar Orbiter next radially aligned withi
 19 November 2026?"
 
 ```bash
-uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next --compact
+heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next --compact
 ```
 
 The first window is 2026-12-01 16:00 to 19:00 UTC, closest at 18:00 UTC with the two 6.2° apart seen

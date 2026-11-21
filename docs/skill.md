@@ -11,8 +11,8 @@ quadratures, conjunctions, viewing geometry, events, magnetic connectivity) and 
 reporting the result: UTC times at the sampling resolution, the Stonyhurst sign, spacecraft status
 and model caveats, always with the HelioFleet or HelioField link.
 
-It needs only a shell with `uvx` (or the package installed). No MCP server or client configuration
-is involved, so it works wherever the assistant can run commands.
+It needs only a shell and the `heliofleet-mcp` command ([install it](getting-started.md)). No MCP
+server or client configuration is involved, so it works wherever the assistant can run commands.
 
 ## Install the skill
 
@@ -32,7 +32,7 @@ is involved, so it works wherever the assistant can run commands.
     `~/.agents/skills/`).
 
 Then ask, for example, "When is STEREO-A next in quadrature with Earth?"; the assistant runs
-`uvx heliofleet-mcp align sta --kind quadrature --next --compact` and answers from the JSON.
+`heliofleet-mcp align sta --kind quadrature --next --compact` and answers from the JSON.
 
 ## Plugins
 

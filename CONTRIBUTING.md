@@ -74,6 +74,10 @@ does. CI runs them on Linux (Python 3.10 to 3.14), macOS and Windows.
   the body under 500 lines. Keep its command table in step with the command line.
 - The plugin manifests (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `plugin.json`)
   carry the package version; `python scripts/check_release.py` checks names and versions.
+- `plugins/heliofleet/` is the skill-only edition submitted to plugin directories: Markdown, JSON,
+  the icon and the licence only, and no install commands in its text. Its `skills/heliofleet` must be
+  an exact copy of the top-level one (`cp -R skills/heliofleet plugins/heliofleet/skills/`);
+  `check_release.py` fails otherwise.
 - Validate the skill with `skills-ref validate skills/heliofleet` (CI does too), and each client's
   manifest with that client's own plugin validator before a submission.
 
