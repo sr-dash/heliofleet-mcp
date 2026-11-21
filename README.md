@@ -22,6 +22,8 @@ alignment code is a line-by-line port of the page's own JavaScript, so the numbe
 Every answer carries a HelioFleet link that reproduces the view in the browser. The same answers are
 available as an MCP server, as one-shot commands that print JSON, and as a Python API.
 
+![One command finds the next Parker Solar Probe and Solar Orbiter alignment (1 December 2026, 18:00 UTC, 6.2 degrees apart); its link opens the same moment on HelioFleet.](https://raw.githubusercontent.com/sr-dash/heliofleet-mcp/main/docs/demo.gif)
+
 ## Tools
 
 | Tool | What it returns |
