@@ -10,6 +10,14 @@ The skill uses the open-source `heliofleet-mcp` command line, which prints JSON 
 HelioField link for every answer. Install it by following the getting-started guide:
 https://sr-dash.github.io/heliofleet-mcp/getting-started/
 
+## Data and network use
+
+- The command line downloads public, read-only data files from https://sr-dash.github.io/heliofleet/
+  (JPL Horizons ephemerides and an event calendar) and https://sr-dash.github.io/heliofield/ (PFSS
+  model products), and caches them on your computer.
+- It sends no personal data, no conversation content and no credentials: the only requests are
+  ordinary downloads of those static files. Nothing is retained on any server.
+
 - Documentation: https://sr-dash.github.io/heliofleet-mcp/
 - Source and issues: https://github.com/sr-dash/heliofleet-mcp
 - Licence: MIT
