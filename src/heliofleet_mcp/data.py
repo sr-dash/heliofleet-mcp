@@ -44,15 +44,60 @@ def _default_local() -> Path | None:
 
 
 def year_of(jd: float) -> int:
+    """UTC calendar year of a Julian date, which names HelioFleet's per-year data files.
+
+    Parameters
+    ----------
+    jd : float
+        Julian date (UT).
+
+    Returns
+    -------
+    int
+        The year.
+
+    Examples
+    --------
+    >>> year_of(2451545.0)
+    2000
+    """
     return datetime.fromtimestamp((jd - JD_UNIX) * 86400.0, tz=timezone.utc).year
 
 
 class DataError(RuntimeError):
-    pass
+    """HelioFleet or HelioField data could not be loaded from the site, the cache or a local checkout."""
 
 
 class Store:
-    """Loads manifest and per-year chunks, and interpolates positions."""
+    """HelioFleet's ephemerides: loads the manifest and per-year files, and interpolates positions.
+
+    Files come from the site and are cached on disk, per data release; when the site cannot be
+    reached, the cache or a local heliofleet checkout is used (``source='auto'``).
+
+    Parameters
+    ----------
+    source : {'auto', 'web', 'local'}, optional
+        Where to read: the site with cache and local fallbacks (``auto``), the site only (``web``),
+        or a local checkout only (``local``). Default: ``HELIOFLEET_SOURCE``, else ``auto``.
+    local : str or pathlib.Path, optional
+        A heliofleet ``data/`` folder. Default: ``HELIOFLEET_LOCAL_DATA``, else a sibling
+        ``heliofleet/data`` checkout if one exists.
+    cache : str or pathlib.Path, optional
+        Cache folder. Default: ``HELIOFLEET_CACHE``, else ``~/.cache/heliofleet-mcp``.
+    site : str, optional
+        Site root. Default: ``HELIOFLEET_SITE``, else https://sr-dash.github.io/heliofleet/.
+    timeout : float, optional
+        Network timeout (s).
+
+    Examples
+    --------
+    Earth's heliocentric ecliptic position (au) at Parker's perihelion of 22 March 2025:
+
+    >>> from heliofleet_mcp.timeutil import parse_time
+    >>> store = Store()
+    >>> [round(c, 3) for c in store.position("earth", parse_time("2025-03-22T22:25Z"))]
+    [-0.996, -0.038, 0.0]
+    """
 
     def __init__(self, source: str | None = None, local: Path | str | None = None,
                  cache: Path | str | None = None, site: str = SITE, timeout: float = 15.0):
@@ -85,7 +130,32 @@ class Store:
         return self.cache / re.sub(r"[^0-9A-Za-z]+", "", gen)
 
     def json(self, rel: str, versioned: bool = True):
-        """A data file (path relative to the site root, e.g. 'data/upcoming.json')."""
+        """Load a published JSON data file.
+
+        Parameters
+        ----------
+        rel : str
+            Path relative to the site root, e.g. ``'data/upcoming.json'``.
+        versioned : bool, optional
+            Cache the file under the current data release (default), so a new monthly release
+            is fetched afresh.
+
+        Returns
+        -------
+        dict or list or None
+            The parsed file, or None if it does not exist.
+
+        Raises
+        ------
+        DataError
+            With ``source='web'``, if the site cannot be reached.
+
+        Examples
+        --------
+        >>> cal = Store().json("data/upcoming.json")
+        >>> sorted(cal)[:2]
+        ['events', 'generated']
+        """
         if self.source != "local":
             cached = (self._version_dir() if versioned else self.cache) / rel
             if cached.exists():
@@ -105,6 +175,28 @@ class Store:
     # ---------- manifest ----------
 
     def manifest(self) -> dict:
+        """The data release's manifest: each body's span, step and years, and the timeline.
+
+        Fetched from the site at most every six hours; falls back to the cached copy, then to a
+        local checkout. A new release clears the in-memory position chunks.
+
+        Returns
+        -------
+        dict
+            ``generated``, ``next_update``, ``source``, ``timeline`` (``start``, ``end`` as Julian
+            dates) and ``bodies`` (per key: ``start``, ``end``, ``step`` in days, ``units``,
+            ``center``, ``years``).
+
+        Raises
+        ------
+        DataError
+            If no source is available.
+
+        Examples
+        --------
+        >>> Store().manifest()["timeline"]["start"]
+        2455197.5
+        """
         with self._lock:
             if self._manifest and time.time() - self._manifest_at < MANIFEST_TTL_S:
                 return self._manifest
@@ -132,19 +224,89 @@ class Store:
 
     @property
     def origin(self) -> str:
+        """Where the loaded manifest came from: ``site``, ``cache`` or ``local (<path>)``.
+
+        Returns
+        -------
+        str
+            The origin of the current data release.
+
+        Examples
+        --------
+        >>> Store().origin in ("site", "cache") or Store().origin.startswith("local")
+        True
+        """
         self.manifest()
         return self._origin
 
     def info(self, key: str) -> dict | None:
+        """Manifest entry of one data series.
+
+        Parameters
+        ----------
+        key : str
+            Series key: a body key (``psp``) or a geocentric series (``ace_geo``).
+
+        Returns
+        -------
+        dict or None
+            ``start``, ``end`` (Julian dates), ``step`` (days), ``units``, ``center`` and ``years``,
+            or None for an unknown key.
+
+        Examples
+        --------
+        >>> Store().info("psp")["step"]
+        0.125
+        """
         return self.manifest()["bodies"].get(key)
 
     def covers(self, key: str, jd: float) -> bool:
+        """Whether a series has data at a time.
+
+        Parameters
+        ----------
+        key : str
+            Series key.
+        jd : float
+            Julian date (UT).
+
+        Returns
+        -------
+        bool
+            True if ``jd`` is within the series' span.
+
+        Examples
+        --------
+        >>> from heliofleet_mcp.timeutil import parse_time
+        >>> Store().covers("psp", parse_time("2025-03-22"))
+        True
+        """
         b = self.info(key)
         return bool(b) and b["start"] <= jd <= b["end"]
 
     # ---------- chunks and interpolation ----------
 
     def chunk(self, key: str, year: int) -> dict | None:
+        """One year of samples of a series, cached in memory.
+
+        Parameters
+        ----------
+        key : str
+            Series key.
+        year : int
+            UTC year.
+
+        Returns
+        -------
+        dict or None
+            ``t0`` (Julian date of the first sample), ``step`` (days), ``n`` and ``d`` (flat
+            x, y, z list in au, or km for geocentric series), or None if the year has no data.
+
+        Examples
+        --------
+        >>> Store().chunk("psp", 2025)["t0"]
+        2460676.5
+        """
         cid = f"{key}/{year}"
         if cid in self._chunks:
             return self._chunks[cid]
@@ -168,7 +330,30 @@ class Store:
         return None
 
     def position(self, key: str, jd: float):
-        """Interpolated (x, y, z), in au (heliocentric) or km (geocentric *_geo), or None."""
+        """Interpolated position of a series at a time.
+
+        Uses a 4-point Lagrange polynomial on the series' uniform UT grid (js/ephem.js), linear
+        interpolation next to a data gap, and the nearest sample at the very ends.
+
+        Parameters
+        ----------
+        key : str
+            Series key: a body key (heliocentric ecliptic J2000, au) or a ``*_geo`` series
+            (geocentric, km).
+        jd : float
+            Julian date (UT).
+
+        Returns
+        -------
+        tuple of float or None
+            ``(x, y, z)``, or None outside the series' span.
+
+        Examples
+        --------
+        >>> from heliofleet_mcp.timeutil import parse_time
+        >>> [round(c, 4) for c in Store().position("psp", parse_time("2025-03-22T22:25Z"))]
+        [-0.0375, 0.0262, 0.0025]
+        """
         b = self.info(key)
         if not b or jd < b["start"] - 1e-9 or jd > b["end"] + 1e-9:
             return None

@@ -8,6 +8,7 @@ Install and run with one command: `uvx heliofleet-mcp` (MCP server), or `uvx hel
 
 - [README](https://github.com/sr-dash/heliofleet-mcp/blob/main/README.md): tools, install, client setup, methods, tests.
 - [AGENTS.md](https://github.com/sr-dash/heliofleet-mcp/blob/main/AGENTS.md): how an assistant should use it (MCP, command line, Python or plain web fetches) and the conventions to keep when answering.
+- [API reference](https://sr-dash.github.io/heliofleet-mcp/): every public class and function of the Python API, with parameters, returns and examples.
 - [CHANGELOG](https://github.com/sr-dash/heliofleet-mcp/blob/main/CHANGELOG.md)
 - [server.json](https://github.com/sr-dash/heliofleet-mcp/blob/main/server.json): the MCP Registry entry.
 

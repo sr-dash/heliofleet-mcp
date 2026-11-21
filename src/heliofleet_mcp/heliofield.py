@@ -48,6 +48,32 @@ def _default_local() -> Path | None:
 
 
 class FieldStore:
+    """HelioField's published files, cached on disk, with a local-checkout fallback.
+
+    Dated daily products never change and are cached for good; the index and the series are
+    refreshed after ``TTL_S`` seconds.
+
+    Parameters
+    ----------
+    source : {'auto', 'web', 'local'}, optional
+        As for :class:`heliofleet_mcp.data.Store`. Default: ``HELIOFLEET_SOURCE``, else ``auto``.
+    local : str or pathlib.Path, optional
+        A heliofield checkout. Default: ``HELIOFIELD_LOCAL``, else a sibling ``heliofield`` folder.
+    cache : str or pathlib.Path, optional
+        Cache root; files go in its ``heliofield/`` folder. Default: ``HELIOFLEET_CACHE``, else
+        ``~/.cache/heliofleet-mcp``.
+    site : str, optional
+        Site root. Default: ``HELIOFIELD_SITE``, else https://sr-dash.github.io/heliofield/.
+    timeout : float, optional
+        Network timeout (s).
+
+    Examples
+    --------
+    >>> idx = FieldStore().json("data/index.json", ttl=3600)
+    >>> idx["dates"] == sorted(idx["dates"])
+    True
+    """
+
     def __init__(self, source: str | None = None, local: Path | str | None = None, cache: Path | str | None = None,
                  site: str = SITE, timeout: float = 15.0):
         self.source = (source or os.environ.get("HELIOFLEET_SOURCE", "auto")).lower()
@@ -59,7 +85,31 @@ class FieldStore:
         self._mem: dict[str, tuple[float, object]] = {}
 
     def json(self, rel: str, ttl: float | None = None):
-        """A file relative to the site root; ttl=None caches it for good (dated products)."""
+        """Load a published JSON file.
+
+        Parameters
+        ----------
+        rel : str
+            Path relative to the site root, e.g. ``'data/index.json'``.
+        ttl : float, optional
+            Seconds before a cached copy is refetched; None (default) keeps it for good, which suits
+            dated products.
+
+        Returns
+        -------
+        dict or list or None
+            The parsed file, or None if it does not exist anywhere.
+
+        Raises
+        ------
+        DataError
+            With ``source='web'``, if the site cannot be reached and nothing is cached.
+
+        Examples
+        --------
+        >>> "dates" in FieldStore().json("data/index.json", ttl=3600)
+        True
+        """
         hit = self._mem.get(rel)
         if hit and (ttl is None or time.time() - hit[0] < ttl):
             return hit[1]
@@ -99,7 +149,50 @@ def _date(value) -> str:
 
 def field_link(date="latest", page="model", *, view=None, layers=None, v=None, rss=None, scs=None, focus=None,
                conn=None, ins=None, embed=False, theme=None, scale=None, rmax=None, site=SITE) -> str:
-    """Link to a HelioField page: model (3D corona), connect, spaceweather or observations."""
+    """Link to a HelioField page.
+
+    Parameters
+    ----------
+    date : str, optional
+        ``YYYY-MM-DD`` or ``latest`` (default). The page computes dates without a daily product
+        in the browser, back to 2010-05-01.
+    page : {'model', 'connect', 'spaceweather', 'observations'}, optional
+        The 3D corona (default), magnetic connectivity, space weather or observations page.
+    view : {'earth', 'north', 'fleet'}, optional
+        Camera of the 3D view.
+    layers : list of str, optional
+        Layers to show, from ``LAYERS``.
+    v : float, optional
+        Solar-wind speed for the spirals (km/s; the pages offer 300 to 800 in steps of 100).
+    rss, scs : float, optional
+        Source-surface height (1.5 to 3.5 solar radii) and current-sheet model radius (5, 10 or
+        21.5); computed dates only.
+    focus : str, optional
+        Body followed on the connect page, from ``FOCUS``.
+    conn, ins, theme, rmax : optional
+        Further page parameters, passed through.
+    embed : bool, optional
+        Embed mode, which also computes past dates without a confirmation dialog.
+    scale : bool, optional
+        Show distances to scale.
+    site : str, optional
+        Site root.
+
+    Returns
+    -------
+    str
+        The URL.
+
+    Raises
+    ------
+    ValueError
+        For an unknown page, view, layer or focus.
+
+    Examples
+    --------
+    >>> field_link("2026-11-01", "connect", v=500, focus="psp")
+    'https://sr-dash.github.io/heliofield/connect.html?date=2026-11-01&v=500&focus=psp'
+    """
     pages = {"model": "", "connect": "connect.html", "spaceweather": "spaceweather.html",
              "observations": "observations.html"}
     if page not in pages:
@@ -130,10 +223,40 @@ def field_link(date="latest", page="model", *, view=None, layers=None, v=None, r
 
 
 class HelioField:
+    """Coronal-field context from HelioField's daily PFSS products.
+
+    The methods read published files and do not solve the field. Daily products cover roughly
+    the last two months; for other dates they return links to the pages, which compute any date
+    since 2010-05-01. Results are model output: see ``CAVEAT``.
+
+    Parameters
+    ----------
+    store : FieldStore, optional
+        The data source. Default: a new :class:`FieldStore`.
+
+    Examples
+    --------
+    >>> HelioField().magnetic_connection("psp")["daily_product"]
+    True
+    """
+
     def __init__(self, store: FieldStore | None = None):
         self.store = store or FieldStore()
 
     def dates(self) -> list[str]:
+        """Dates with a daily product.
+
+        Returns
+        -------
+        list of str
+            ``YYYY-MM-DD`` dates, oldest first.
+
+        Examples
+        --------
+        >>> d = HelioField().dates()
+        >>> len(d) > 10 and d == sorted(d)
+        True
+        """
         idx = self.store.json("data/index.json", ttl=TTL_S) or {}
         return idx.get("dates", [])
 
@@ -161,6 +284,45 @@ class HelioField:
     # ---------- tools ----------
 
     def magnetic_connection(self, body="all", date="latest", solar_wind_km_s=400.0, self_consistent=False):
+        """Where a body connects magnetically to the Sun (the ``magnetic_connection`` tool).
+
+        Follows the Parker spiral from the body to the source surface, then the PFSS field line
+        down to the photosphere.
+
+        Parameters
+        ----------
+        body : str, optional
+            Body key or name (``earth``, ``psp``, ``solo``, ``bepi``, ``sta``, the L1 fleet), or
+            ``all`` (default).
+        date : str, optional
+            ``YYYY-MM-DD``, any time :func:`heliofleet_mcp.timeutil.parse_time` accepts, or
+            ``latest`` (default).
+        solar_wind_km_s : float, optional
+            Wind speed for the spiral; the nearest speed of the product's grid is used.
+        self_consistent : bool, optional
+            Use, for each body, the grid speed closest to its own WSA-type estimate.
+
+        Returns
+        -------
+        dict
+            With a daily product: ``date``, ``map_time_utc``, ``model``, ``carrington_rotation``,
+            Earth's ``L0``/``B0``, ``speed_choice``, ``columns``, ``connections`` (per body: position,
+            ``wind_used_km_s``, ``source_surface_point_deg``, ``footpoint_deg``, ``expansion_factor_fs``,
+            ``dchb_deg``, ``wsa_speed_km_s``), ``caveat`` and ``links``. Without one: a note and links.
+
+        Raises
+        ------
+        ValueError
+            For an unknown body, a body without a connection, or a date before 2010-05-01.
+        DataError
+            If the daily index cannot be loaded.
+
+        Examples
+        --------
+        >>> r = HelioField().magnetic_connection("psp", solar_wind_km_s=450)
+        >>> r["connections"][0]["body"], r["connections"][0]["wind_used_km_s"]
+        ('psp', 450)
+        """
         d, meta, dates = self._product(_date(date))
         keys = None if body in (None, "", "all") else [resolve(body)]
         v_in = float(solar_wind_km_s)
@@ -217,6 +379,30 @@ class HelioField:
         }
 
     def space_weather(self, date="latest"):
+        """HelioField's space-weather indicators for a day (the ``space_weather`` tool).
+
+        Parameters
+        ----------
+        date : str, optional
+            ``YYYY-MM-DD`` or ``latest`` (default).
+
+        Returns
+        -------
+        dict
+            ``date``, ``found`` and, when found, the day's row (model wind speed and sector at Earth,
+            next sector boundary, outlook, alert level, measured L1 wind, ...), ``units``, ``about``,
+            ``caveat`` and ``links``; otherwise the available range and a link.
+
+        Raises
+        ------
+        DataError
+            If the series cannot be loaded.
+
+        Examples
+        --------
+        >>> HelioField().space_weather()["found"]
+        True
+        """
         d = _date(date)
         data = self.store.json("data/spaceweather/daily.json", ttl=TTL_S) or {}
         rows = data.get("rows", [])
@@ -238,6 +424,35 @@ class HelioField:
         }
 
     def coronal_field(self, date="latest"):
+        """Summary of the coronal magnetic field for a day (the ``coronal_field`` tool).
+
+        Parameters
+        ----------
+        date : str, optional
+            ``YYYY-MM-DD`` or ``latest`` (default). The solar-cycle context is available for any
+            date since 2010; the rest needs a daily product.
+
+        Returns
+        -------
+        dict
+            ``date``, ``daily_product``, ``map_time_utc``, ``magnetogram``, ``model``,
+            ``carrington_rotation``, Earth's ``L0``/``B0``, ``open_flux_Mx``, ``field_lines``,
+            ``current_sheet_segments``, ``solar_cycle`` (open flux and area, current-sheet tilt and
+            polar fields of the nearest rotation), ``caveat`` and ``links``.
+
+        Raises
+        ------
+        ValueError
+            For a date before 2010-05-01.
+        DataError
+            If the daily index cannot be loaded.
+
+        Examples
+        --------
+        >>> c = HelioField().coronal_field()
+        >>> c["daily_product"], c["open_flux_Mx"] > 0
+        (True, True)
+        """
         d, meta, dates = self._product(_date(date))
         series = self.store.json("data/series/rotations.json", ttl=TTL_S) or {}
         cycle = None
@@ -273,7 +488,29 @@ def _grid_speed(v: float) -> int:
 
 
 def register(server, store: FieldStore | None = None) -> HelioField:
-    """Add the HelioField tools to an MCP server."""
+    """Add the HelioField tools to an MCP server.
+
+    Registers ``magnetic_connection``, ``space_weather``, ``coronal_field`` and ``heliofield_link``.
+    Their docstrings are the tool descriptions MCP clients show.
+
+    Parameters
+    ----------
+    server : mcp.server.fastmcp.FastMCP or mcp.server.mcpserver.MCPServer
+        The server to extend.
+    store : FieldStore, optional
+        The data source.
+
+    Returns
+    -------
+    HelioField
+        The instance behind the tools.
+
+    Examples
+    --------
+    >>> from mcp.server.fastmcp import FastMCP  # doctest: +SKIP
+    >>> register(FastMCP("demo"))  # doctest: +SKIP
+    <heliofleet_mcp.heliofield.HelioField object at ...>
+    """
     hf = HelioField(store)
 
     @server.tool()

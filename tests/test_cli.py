@@ -61,3 +61,9 @@ def test_version_and_python_api():
     assert heliofleet_mcp.Fleet.__name__ == "Fleet" and heliofleet_mcp.HelioField.__name__ == "HelioField"
     with pytest.raises(AttributeError):
         heliofleet_mcp.Nope  # noqa: B018
+
+
+def test_python_api_does_not_load_the_mcp_sdk():
+    code = "import sys, heliofleet_mcp; heliofleet_mcp.Fleet; print('mcp' in sys.modules)"
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert out.stdout.strip() == "False", out.stderr

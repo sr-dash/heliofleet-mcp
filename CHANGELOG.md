@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.0 (2026-11-20)
+
+- API reference at https://sr-dash.github.io/heliofleet-mcp/, built from the docstrings with pdoc and published on GitHub Pages.
+- numpydoc docstrings with Parameters, Returns and Examples for every public class, function and
+  method of the Python API. The examples run as doctests with the tests; ruff checks the docstring
+  format and a test checks the sections.
+- `Fleet`, `HelioField`, `Store` and `FieldStore` are imported directly by `heliofleet_mcp`, so
+  editors and documentation tools see them. Importing the package still does not load the MCP SDK.
+- CI on Linux (Python 3.10 to 3.14), macOS and Windows, with coverage and ruff (PEP 8). Python 3.14
+  classifier; `test`, `lint` and `docs` extras.
+- `CONTRIBUTING.md` (including when a contribution is not accepted) and `CODE_OF_CONDUCT.md`
+  (Contributor Covenant 2.1).
+
 ## 0.1.2 (2026-11-20)
 
 - Package metadata only, no code changes: more PyPI and Zenodo keywords (missions, coordinate

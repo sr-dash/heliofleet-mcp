@@ -55,7 +55,31 @@ ALIASES = {
 
 
 def resolve(name: str) -> str:
-    """Body key from a key, short name or common alias (case-insensitive)."""
+    """Body key from a key, full or short name, or common alias.
+
+    Parameters
+    ----------
+    name : str
+        A key (``psp``), a name (``Parker Solar Probe``), a short name (``Parker``) or an alias
+        (``STEREO-A``, ``ahead``); case and surrounding spaces are ignored.
+
+    Returns
+    -------
+    str
+        The body key used throughout the package and in HelioFleet's data files.
+
+    Raises
+    ------
+    ValueError
+        If the name matches no body.
+
+    Examples
+    --------
+    >>> resolve("Parker")
+    'psp'
+    >>> resolve("Solar Orbiter")
+    'solo'
+    """
     k = name.strip().lower()
     if k in BODIES:
         return k

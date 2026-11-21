@@ -34,15 +34,69 @@ def _r(v, d):
 
 
 class Fleet:
+    """Positions, viewing geometry, alignment search and events for the heliophysics fleet.
+
+    Every method returns plain JSON-ready dicts, the same as the MCP tools and the command line,
+    including a HelioFleet link that reproduces the view.
+
+    Parameters
+    ----------
+    store : Store, optional
+        The data source. Default: a new :class:`heliofleet_mcp.data.Store` (the site, with cache
+        and local fallbacks).
+
+    Examples
+    --------
+    >>> f = Fleet()
+    >>> f.position("Parker", "2025-03-22T22:25Z")["r_au"]
+    0.045863
+    """
+
     def __init__(self, store: Store | None = None):
         self.store = store or Store()
 
     # ---------- positions (js/scene.js) ----------
 
     def earth(self, jd):
+        """Earth's heliocentric position.
+
+        Parameters
+        ----------
+        jd : float
+            Julian date (UT).
+
+        Returns
+        -------
+        tuple of float or None
+            Ecliptic J2000 position (au), or None outside the ephemerides.
+
+        Examples
+        --------
+        >>> [round(c, 3) for c in Fleet().earth(2460757.43403)]
+        [-0.996, -0.038, 0.0]
+        """
         return self.store.position("earth", jd)
 
     def helio(self, key, jd):
+        """Heliocentric position of a body, from its own series or Earth plus its geocentric series.
+
+        Parameters
+        ----------
+        key : str
+            Body key.
+        jd : float
+            Julian date (UT).
+
+        Returns
+        -------
+        tuple of float or None
+            Ecliptic J2000 position (au), or None where the body has no data.
+
+        Examples
+        --------
+        >>> [round(c, 4) for c in Fleet().helio("psp", 2460757.43403)]
+        [-0.0375, 0.0262, 0.0025]
+        """
         b = BODIES[key]
         if not b.get("derived"):
             return self.store.position(key, jd)
@@ -53,6 +107,29 @@ class Fleet:
         return (e[0] + g[0] / AU_KM, e[1] + g[1] / AU_KM, e[2] + g[2] / AU_KM)
 
     def status(self, key, jd, p):
+        """Status of a spacecraft at a time, as on the map (js/scene.js).
+
+        Parameters
+        ----------
+        key : str
+            Body key.
+        jd : float
+            Julian date (UT).
+        p : tuple of float or None
+            Its position from :meth:`helio`.
+
+        Returns
+        -------
+        str
+            ``prelaunch``, ``ended``, ``approx`` (no data; shown at Earth), ``nodata``, ``lost``
+            (a prediction after loss of contact) or ``ok``.
+
+        Examples
+        --------
+        >>> f = Fleet()
+        >>> f.status("psp", 2460757.43403, f.helio("psp", 2460757.43403))
+        'ok'
+        """
         b = BODIES[key]
         if b.get("launch") and jd < parse_time(b["launch"]):
             return "prelaunch"
@@ -65,7 +142,29 @@ class Fleet:
         return "ok"
 
     def at(self, key, jd, earth=None):
-        """(status, heliocentric position in au or None), with the map's fallbacks."""
+        """Status and position of any body, with the map's fallbacks.
+
+        Parameters
+        ----------
+        key : str
+            Body key (spacecraft, planet or ``earth``).
+        jd : float
+            Julian date (UT).
+        earth : tuple of float, optional
+            Earth's position at ``jd``, if already known.
+
+        Returns
+        -------
+        tuple
+            ``(status, position)``: the status as in :meth:`status` (``ok`` for planets) and the
+            ecliptic J2000 position in au, or None when there is nothing to show. ``approx``
+            bodies are placed at Earth.
+
+        Examples
+        --------
+        >>> Fleet().at("stb", 2460757.43403)
+        ('ended', None)
+        """
         if earth is None:
             earth = self.earth(jd)
         if key == "earth":
@@ -82,6 +181,35 @@ class Fleet:
     # ---------- coordinate rows (js/tools.js row) ----------
 
     def body_row(self, key, jd, earth, wind=400.0):
+        """One row of the page's Coordinates table (js/tools.js).
+
+        Parameters
+        ----------
+        key : str
+            Body key.
+        jd : float
+            Julian date (UT).
+        earth : tuple of float
+            Earth's position at ``jd`` (au).
+        wind : float, optional
+            Solar-wind speed for the Parker-spiral footpoint (km/s).
+
+        Returns
+        -------
+        dict
+            ``body``, ``name``, ``time_utc``, ``status`` and, when there is a position, ``r_au``,
+            ``hgs_lon_deg``, ``hgs_lat_deg``, ``carrington_lon_deg``, ``ecliptic_j2000_au``,
+            ``hee_au``, ``sep_from_earth_deg``, ``dist_to_earth_au``, ``light_time_s`` and (not for
+            planets) ``footpoint_hgs_lon_deg``. See ``FRAME_NOTES``.
+
+        Examples
+        --------
+        >>> from heliofleet_mcp.timeutil import parse_time
+        >>> f, jd = Fleet(), parse_time("2025-03-22T22:25Z")
+        >>> row = f.body_row("psp", jd, f.earth(jd))
+        >>> row["hgs_lon_deg"], row["light_time_s"]
+        (-37.2502, 22.89)
+        """
         st, p = self.at(key, jd, earth)
         out = {"body": key, "name": BODIES[key]["name"], "time_utc": iso(jd), "status": st}
         if p is None:
@@ -106,6 +234,36 @@ class Fleet:
         return out
 
     def position(self, body, time=None, wind=400.0):
+        """Where one body is at a time (the ``get_position`` tool).
+
+        Parameters
+        ----------
+        body : str
+            Body key or name (``psp``, ``Parker``, ``Solar Orbiter``, ``earth``, ``mars``, ...).
+        time : str or float, optional
+            UTC time in any form :func:`heliofleet_mcp.timeutil.parse_time` accepts. Default: now.
+        wind : float, optional
+            Solar-wind speed for the Parker-spiral footpoint (km/s).
+
+        Returns
+        -------
+        dict
+            The coordinate row of :meth:`body_row`, a ``note`` when the body has no position or
+            is shown at Earth, and a HelioFleet ``link``.
+
+        Raises
+        ------
+        ValueError
+            For an unknown body or a time outside the ephemerides.
+
+        Examples
+        --------
+        >>> p = Fleet().position("Parker", "2025-03-22T22:25Z")
+        >>> p["r_au"], p["status"]
+        (0.045863, 'ok')
+        >>> p["link"]
+        'https://sr-dash.github.io/heliofleet/?t=2025-03-22T22:25Z'
+        """
         key = resolve(body)
         jd = parse_time(time)
         earth = self._earth_or_raise(jd)
@@ -118,6 +276,30 @@ class Fleet:
         return row
 
     def fleet_state(self, time=None, include_planets=True, wind=400.0):
+        """Positions of Earth, every spacecraft and the planets (the ``get_fleet_state`` tool).
+
+        Parameters
+        ----------
+        time : str or float, optional
+            UTC time. Default: now.
+        include_planets : bool, optional
+            Include Mercury, Venus and Mars.
+        wind : float, optional
+            Solar-wind speed for the footpoints (km/s).
+
+        Returns
+        -------
+        dict
+            ``time_utc``, ``frame_notes``, ``solar_wind_km_s``, ``bodies`` (rows as in
+            :meth:`body_row`), ``not_shown`` (bodies without a position and why), ``link`` and
+            ``data`` (the loaded release).
+
+        Examples
+        --------
+        >>> s = Fleet().fleet_state("2025-03-22T22:25Z")
+        >>> len(s["bodies"]), [b["body"] for b in s["not_shown"]]
+        (15, ['imap', 'swfo', 'cgo', 'stb'])
+        """
         jd = parse_time(time)
         earth = self._earth_or_raise(jd)
         keys = ["earth", *SPACECRAFT, *(PLANETS if include_planets else [])]
@@ -141,6 +323,36 @@ class Fleet:
     # ---------- viewing geometry (js/tools.js geometryRows) ----------
 
     def viewing_geometry(self, observer="all", time=None):
+        """What an observer sees of the Sun (the ``viewing_geometry`` tool; js/tools.js geometryRows).
+
+        Parameters
+        ----------
+        observer : str, optional
+            Body key or name of Earth or a spacecraft, or ``all`` (default) for every one with a
+            position.
+        time : str or float, optional
+            UTC time. Default: now.
+
+        Returns
+        -------
+        dict
+            ``time_utc``, ``columns`` (see ``GEOMETRY_COLUMNS``), ``observers`` and ``link``. Each
+            observer row has ``r_au``, ``light_time_s``, ``offset_vs_earth_s``, ``rsun_arcsec``
+            (RSUN_OBS), ``b0_deg`` (HGLT_OBS), ``hgs_lon_deg`` (HGLN_OBS), ``l0_deg`` (CRLN_OBS,
+            the observer's own light time), ``km_per_arcsec``, ``scale_vs_earth`` and, for sky-view
+            observers, ``sky_link``.
+
+        Raises
+        ------
+        ValueError
+            For a planet other than Earth, or a single observer without a position.
+
+        Examples
+        --------
+        >>> g = Fleet().viewing_geometry("psp", "2025-03-22T22:25Z")["observers"][0]
+        >>> g["rsun_arcsec"], g["l0_deg"]
+        (20951.01, 53.3699)
+        """
         jd = parse_time(time)
         e = self._earth_or_raise(jd)
         d_e = norm(e)
@@ -185,6 +397,60 @@ class Fleet:
 
     def find_alignments(self, kind="radial", a="psp", b=None, tolerance_deg=None, start=None, end=None,
                         wind=400.0, max_windows=None, step_hours=None):
+        """Time windows when a geometric condition holds (the ``find_alignments`` tool).
+
+        The search samples the range on a uniform grid, hourly when Parker is involved and every
+        six hours otherwise, as HelioFleet's alignment tool does (js/tools.js findAlignments), so
+        the windows are identical to the page's.
+
+        Parameters
+        ----------
+        kind : {'radial', 'quadrature', 'conjunction', 'connection'}, optional
+            ``radial``: Sun-centred angle between ``a`` and ``b`` within the tolerance (default 5 deg).
+            ``quadrature``: ``a`` 90 deg from Earth seen from the Sun, within the tolerance (default 5).
+            ``conjunction``: ``a`` behind the Sun seen from Earth, within the tolerance of Sun centre
+            (default 2). ``connection``: Parker-spiral footpoints of ``a`` and ``b`` within the
+            tolerance in longitude (default 10).
+        a : str, optional
+            First body (key or name).
+        b : str, optional
+            Second body, for ``radial`` and ``connection``. Default: Earth.
+        tolerance_deg : float, optional
+            Tolerance (deg). Default depends on ``kind``.
+        start, end : str or float, optional
+            UTC range. Default: now to one year later (at most to the end of the ephemerides);
+            at most 3660 days.
+        wind : float, optional
+            Solar-wind speed for ``connection`` (km/s).
+        max_windows : int, optional
+            Stop after this many windows; 1 answers "when is the next ...".
+        step_hours : float, optional
+            Override the sampling step.
+
+        Returns
+        -------
+        dict
+            ``query``, ``definition``, ``step_hours``, ``samples``, ``windows``, ``best_value_meaning``,
+            ``resolution_note`` and a ``link`` that reruns the search on the page. Each window has
+            ``start_utc``, ``end_utc``, ``duration_days``, ``best_time_utc``, ``best_value_deg``, the
+            bodies' positions at the best time, ``touches_range_edge``, a ``side`` for quadratures,
+            and a ``link``.
+
+        Raises
+        ------
+        ValueError
+            For an unknown kind or body, equal bodies, Earth in a quadrature or conjunction, or a
+            bad range.
+
+        Examples
+        --------
+        The first radial alignment of Solar Orbiter and Parker within 5 deg in 2025:
+
+        >>> r = Fleet().find_alignments("radial", "solo", "psp", 5, "2025-01-01", "2025-12-31", max_windows=1)
+        >>> w = r["windows"][0]
+        >>> w["start_utc"], w["end_utc"], w["best_value_deg"]
+        ('2025-04-04T10:00:00Z', '2025-04-06T02:00:00Z', 1.837)
+        """
         kind = kind.lower()
         if kind not in ALIGN_KINDS:
             raise ValueError(f"kind must be one of {', '.join(ALIGN_KINDS)}")
@@ -296,6 +562,36 @@ class Fleet:
     # ---------- events ----------
 
     def upcoming_events(self, start=None, end=None, kind=None, body=None, include_space_weather=False):
+        """HelioFleet's event calendar between two times (the ``list_upcoming_events`` tool).
+
+        The calendar is rebuilt with each monthly data release and lists events from 30 days
+        before that build to the end of the ephemerides; use :meth:`find_alignments` for past
+        dates, other pairs or other tolerances.
+
+        Parameters
+        ----------
+        start, end : str or float, optional
+            UTC range. Default: now to one year later.
+        kind : str, optional
+            Comma list of ``perihelion``, ``alignment``, ``quadrature``, ``conjunction``, ``eclipse``.
+        body : str, optional
+            Keep events that involve this body.
+        include_space_weather : bool, optional
+            Add NASA DONKI flares, CMEs and geomagnetic storms in the range.
+
+        Returns
+        -------
+        dict
+            ``range_utc``, ``generated``, ``events`` (``kind``, ``time_utc``, ``end_utc``, ``title``,
+            ``detail``, ``bodies``, ``values``, ``link``), ``coverage_note``, ``calendar_ics`` and,
+            if asked, ``space_weather``.
+
+        Examples
+        --------
+        >>> ev = Fleet().upcoming_events(kind="perihelion", body="psp")
+        >>> all(e["kind"] == "perihelion" for e in ev["events"])
+        True
+        """
         jd0 = parse_time(start)
         jd1 = parse_time(end) if end is not None else jd0 + 365
         up = self.store.json("data/upcoming.json") or {"events": []}
@@ -343,7 +639,48 @@ class Fleet:
              hide=None, spirals=None, solar_wind_km_s=None, spot_system=None, spot_lon=None, spot_lat=None,
              align_kind=None, align_a=None, align_b=None, align_tolerance_deg=None, align_from=None,
              align_to=None):
-        """A HelioFleet map or sky-view URL that reproduces a view."""
+        """A HelioFleet map or sky-view URL that reproduces a view (the ``heliofleet_link`` tool).
+
+        Parameters
+        ----------
+        time : str or float, optional
+            UTC time. Default: now.
+        page : {'map', 'sky'}, optional
+            The map, or the sky view from ``observer``.
+        tab : str, optional
+            Map tab: ``coords``, ``geom``, ``align``, ``vis``, ``series`` or ``anim``.
+        observer : str, optional
+            Sky-view observer (``earth``, ``solo``, ``psp``, ``bepi``, ``sta``, ``stb``, ``maven``).
+        frame, view : str, optional
+            Map frame (``hee``, ``hae``) and view (``top``, ``side``).
+        zoom : float, optional
+            Map zoom (au) or sky-view field (solar radii).
+        hide : list of str, optional
+            Bodies to hide on the map.
+        spirals : bool, optional
+            Draw Parker spirals.
+        solar_wind_km_s : float, optional
+            Spiral wind speed (km/s).
+        spot_system, spot_lon, spot_lat : optional
+            A marked surface point: ``carrington`` or ``stonyhurst`` and its longitude and latitude (deg).
+        align_kind, align_a, align_b, align_tolerance_deg, align_from, align_to : optional
+            An alignment search for the page to rerun (``radial``, ``quadrature`` or ``connection``).
+
+        Returns
+        -------
+        dict
+            ``{"link": url}``.
+
+        Raises
+        ------
+        ValueError
+            For an unknown page, tab or body, or an incomplete alignment.
+
+        Examples
+        --------
+        >>> Fleet().link("2025-03-22T22:25Z", tab="geom")["link"]
+        'https://sr-dash.github.io/heliofleet/?t=2025-03-22T22:25Z&tab=geom#tools'
+        """
         jd = parse_time(time)
         if page == "sky":
             return {"link": sky_link(jd, resolve(observer), zoom=zoom)}
@@ -365,7 +702,19 @@ class Fleet:
         return {"link": url}
 
     def data_status(self):
-        """Loaded data release, where it came from, and each body's ephemeris span."""
+        """The loaded data release and each body's ephemeris span (the ``data_status`` tool).
+
+        Returns
+        -------
+        dict
+            :meth:`data_info`, ``bodies`` (per series: ``start_utc``, ``end_utc``, ``step_days``,
+            ``units``, ``center``) and a link to the methods page.
+
+        Examples
+        --------
+        >>> Fleet().data_status()["bodies"]["psp"]["step_days"]
+        0.125
+        """
         m = self.store.manifest()
         return {**self.data_info(),
                 "bodies": {k: {"start_utc": iso(v["start"]), "end_utc": iso(v["end"]), "step_days": v["step"],
@@ -375,6 +724,19 @@ class Fleet:
     # ---------- misc ----------
 
     def data_info(self):
+        """Which data release is loaded and from where.
+
+        Returns
+        -------
+        dict
+            ``generated`` (build time), ``next_update``, ``source`` and ``loaded_from``
+            (``site``, ``cache`` or ``local (<path>)``).
+
+        Examples
+        --------
+        >>> sorted(Fleet().data_info())
+        ['generated', 'loaded_from', 'next_update', 'source']
+        """
         m = self.store.manifest()
         return {"generated": m.get("generated"), "next_update": m.get("next_update"),
                 "source": m.get("source"), "loaded_from": self.store.origin}

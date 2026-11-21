@@ -1,0 +1,52 @@
+name: docs
+
+# API reference from the numpydoc docstrings, published on GitHub Pages
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "pyproject.toml", ".github/workflows/docs.yml"]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: pip install . pdoc
+      - name: Build the API reference
+        run: |
+          version=$(python -c "import heliofleet_mcp; print(heliofleet_mcp.__version__)")
+          pdoc -d numpy -o site \
+            --footer-text "heliofleet-mcp $version" \
+            --edit-url heliofleet_mcp=https://github.com/sr-dash/heliofleet-mcp/blob/main/src/heliofleet_mcp/ \
+            heliofleet_mcp heliofleet_mcp.geometry heliofleet_mcp.heliofield heliofleet_mcp.data \
+            heliofleet_mcp.frames heliofleet_mcp.timeutil heliofleet_mcp.links heliofleet_mcp.catalog \
+            heliofleet_mcp.cli heliofleet_mcp.server
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

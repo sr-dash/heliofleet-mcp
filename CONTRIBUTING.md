@@ -57,7 +57,12 @@ does. CI runs them on Linux (Python 3.10 to 3.14), macOS and Windows.
 
 - PEP 8, checked with ruff (pycodestyle and pyflakes rules, 120-character lines; settings in
   `pyproject.toml`).
-- Public functions and classes get a docstring that says what they return and in which units.
+- Public functions, classes and methods get a numpydoc docstring with Parameters, Returns and
+  Examples sections; ruff checks the format and `tests/test_docstrings.py` checks the sections.
+  Examples run as doctests, so give them stable output (fixed past dates, rounded numbers). The
+  [API reference](https://sr-dash.github.io/heliofleet-mcp/) is built from these docstrings by the `docs` workflow.
+- The docstrings of the MCP tools (in `server.py` and `heliofield.register`) are the descriptions
+  MCP clients show; keep them as plain prose for clients, not numpydoc.
 - Times are UTC; angles are degrees; distances are au unless the name says otherwise.
 - Keep the MCP tools, the command line and the Python API in step: they return the same JSON.
 

@@ -4,6 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/heliofleet-mcp)](https://pypi.org/project/heliofleet-mcp/)
 [![MCP Registry](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fregistry.modelcontextprotocol.io%2Fv0%2Fservers%2Fio.github.sr-dash%252Fheliofleet-mcp%2Fversions%2Flatest&query=%24.server.version&label=MCP%20Registry&color=blue)](https://registry.modelcontextprotocol.io/v0/servers/io.github.sr-dash%2Fheliofleet-mcp/versions/latest)
+[![API reference](https://img.shields.io/badge/docs-API%20reference-blue)](https://sr-dash.github.io/heliofleet-mcp/)
 [![tests](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/tests.yml/badge.svg)](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/tests.yml)
 [![release](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/release.yml/badge.svg)](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/release.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/heliofleet-mcp/)
@@ -152,6 +153,9 @@ HelioField().magnetic_connection("psp", solar_wind_km_s=450)
 
 The methods return the same dictionaries as the MCP tools. `Fleet` and `HelioField` take a
 `Store` or `FieldStore` for a different source, cache or offline checkout.
+
+The [API reference](https://sr-dash.github.io/heliofleet-mcp/) documents every public class and function, with parameters, return
+values and examples (numpydoc docstrings, built with pdoc). The examples run as doctests in CI.
 
 ## For assistants
 

@@ -102,7 +102,28 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def run(args: argparse.Namespace):
-    """Answer one command; returns the JSON-ready result."""
+    """Answer one parsed command.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments from the command-line parser.
+
+    Returns
+    -------
+    dict
+        The JSON-ready result, the same as the matching MCP tool's.
+
+    Raises
+    ------
+    ValueError
+        For an unknown command, or bad input passed on from the tool.
+
+    Examples
+    --------
+    >>> run(_parser().parse_args(["link", "--time", "2025-03-22T22:25Z", "--tab", "geom"]))
+    {'link': 'https://sr-dash.github.io/heliofleet/?t=2025-03-22T22:25Z&tab=geom#tools'}
+    """
     if args.cmd in ("connection", "spaceweather", "field"):
         from .heliofield import HelioField
         hf = HelioField()
@@ -133,6 +154,27 @@ def run(args: argparse.Namespace):
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Entry point of the ``heliofleet-mcp`` command.
+
+    With no command (or ``serve``), runs the MCP server over stdio. Otherwise answers one
+    command and prints its JSON to stdout; errors go to stderr as ``{"error", "type"}``.
+
+    Parameters
+    ----------
+    argv : list of str, optional
+        Arguments without the program name. Default: ``sys.argv[1:]``.
+
+    Returns
+    -------
+    int
+        Exit status: 0 on success, 2 on an error.
+
+    Examples
+    --------
+    >>> main(["link", "--time", "2025-03-22T22:25Z", "--compact"])
+    {"link":"https://sr-dash.github.io/heliofleet/?t=2025-03-22T22:25Z"}
+    0
+    """
     args = _parser().parse_args(argv)
     if args.cmd in (None, "serve"):
         from .server import main as serve

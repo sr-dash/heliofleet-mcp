@@ -33,6 +33,8 @@ the Sun. It covers using this repository to answer such questions and working on
    HelioField().magnetic_connection("solo")
    ```
 
+   The API reference is at https://sr-dash.github.io/heliofleet-mcp/.
+
 4. **You can only fetch web pages**: read the data directly. HelioFleet's guide for automated readers
    is https://sr-dash.github.io/heliofleet/llms.txt, and the formulas are on
    https://sr-dash.github.io/heliofleet/methods.html. Positions are in
