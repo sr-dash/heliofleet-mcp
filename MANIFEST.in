@@ -1,4 +1,4 @@
-include CHANGELOG.md server.json
+include CHANGELOG.md server.json AGENTS.md llms.txt CITATION.cff .zenodo.json
 recursive-include tests *.py *.json *.mjs
 recursive-include scripts *.py *.sh
 prune .github

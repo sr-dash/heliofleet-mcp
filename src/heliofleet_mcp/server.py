@@ -10,9 +10,7 @@ try:  # mcp >= 2
 except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server
 
-from .geometry import ALIGN_KINDS, Fleet
-from .links import map_link, sky_link
-from .timeutil import date_str, iso, parse_time
+from .geometry import Fleet
 
 INSTRUCTIONS = """\
 Positions and viewing geometry of heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind,
@@ -97,35 +95,18 @@ def heliofleet_link(time: str = "now", page: Literal["map", "sky"] = "map", tab:
     view, zoom (au), hide (body keys), spirals, wind, a marked surface spot, a tab (coords, geom,
     align, vis, series, anim) and an alignment search to rerun. page=sky: the plane of the sky seen
     from observer (earth, solo, psp, bepi, sta, stb, maven), zoom in solar radii."""
-    jd = parse_time(time)
-    if page == "sky":
-        url = sky_link(jd, observer, zoom=zoom)
-    else:
-        spot = None
-        if spot_system and spot_lon is not None and spot_lat is not None:
-            spot = {"sys": spot_system, "lon": spot_lon, "lat": spot_lat}
-            tab = tab or "vis"
-        align = None
-        if align_kind:
-            if not (align_a and align_from and align_to):
-                raise ValueError("an alignment link needs align_a, align_from and align_to")
-            align = {"kind": align_kind, "a": align_a, "b": align_b or "earth",
-                     "tol": align_tolerance_deg or ALIGN_KINDS[align_kind]["tol"],
-                     "from": date_str(parse_time(align_from)), "to": date_str(parse_time(align_to))}
-        url = map_link(jd, tab=tab, align=align, spot=spot, frame=frame, view=view, zoom=zoom,
-                       hide=hide, spirals=spirals, wind=solar_wind_km_s)
-    return {"link": url}
+    return fleet.link(time, page, tab=tab, observer=observer, frame=frame, view=view, zoom=zoom, hide=hide,
+                      spirals=spirals, solar_wind_km_s=solar_wind_km_s, spot_system=spot_system,
+                      spot_lon=spot_lon, spot_lat=spot_lat, align_kind=align_kind, align_a=align_a,
+                      align_b=align_b, align_tolerance_deg=align_tolerance_deg, align_from=align_from,
+                      align_to=align_to)
 
 
 @mcp.tool()
 def data_status() -> dict[str, Any]:
     """Which HelioFleet data release is loaded (build time, next monthly update, where it came from)
     and each body's ephemeris span."""
-    m = fleet.store.manifest()
-    return {**fleet.data_info(),
-            "bodies": {k: {"start_utc": iso(v["start"]), "end_utc": iso(v["end"]), "step_days": v["step"],
-                           "units": v["units"], "center": v["center"]} for k, v in m["bodies"].items()},
-            "link": "https://sr-dash.github.io/heliofleet/methods.html"}
+    return fleet.data_status()
 
 
 def _load_plugins() -> list[str]:
@@ -148,6 +129,7 @@ PLUGINS = _load_plugins()
 
 
 def main() -> None:
+    """Serve MCP over stdio (what MCP clients launch)."""
     mcp.run("stdio")
 
 

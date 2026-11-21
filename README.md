@@ -10,6 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/sr-dash/heliofleet-mcp/blob/main/LICENSE)
 [![Data: HelioFleet](https://img.shields.io/badge/data-HelioFleet-orange)](https://sr-dash.github.io/heliofleet/)
 [![Data: HelioField](https://img.shields.io/badge/data-HelioField-orange)](https://sr-dash.github.io/heliofield/)
+[![DOI](https://zenodo.org/badge/1464806835.svg)](https://zenodo.org/badge/latestdoi/1464806835)
 
 A small [Model Context Protocol](https://modelcontextprotocol.io) server that answers
 spacecraft-geometry questions from [HelioFleet](https://sr-dash.github.io/heliofleet/)'s published
@@ -18,7 +19,8 @@ line up. It is a thin layer over HelioFleet's static JSON files (JPL Horizons ep
 2010 to about 2030, refreshed monthly). Nothing is recomputed from scratch. The frame and
 alignment code is a line-by-line port of the page's own JavaScript, so the numbers match the site.
 
-Every answer carries a HelioFleet link that reproduces the view in the browser.
+Every answer carries a HelioFleet link that reproduces the view in the browser. The same answers are
+available as an MCP server, as one-shot commands that print JSON, and as a Python API.
 
 ## Tools
 
@@ -115,6 +117,48 @@ git clone https://github.com/sr-dash/heliofleet-mcp && cd heliofleet-mcp
 python3 -m venv .venv && .venv/bin/pip install -e '.[test]' jplephem
 ```
 
+## Command line
+
+The same program answers one question and prints the tool's JSON, with no server or client set-up.
+
+```bash
+uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next   # next Parker-Solar Orbiter alignment
+uvx heliofleet-mcp align sta --kind quadrature --after 2027-01-01      # STEREO-A quadratures in 2027
+uvx heliofleet-mcp position parker --time 2025-03-22T22:25Z            # coordinates at a moment
+uvx heliofleet-mcp geometry solo                                       # B0, L0, solar radius from Solar Orbiter now
+uvx heliofleet-mcp events --kind perihelion,alignment                  # the coming year's calendar
+uvx heliofleet-mcp connection psp --wind 450                           # where Parker connects to the Sun
+uvx heliofleet-mcp spaceweather                                        # HelioField's outlook at Earth
+uvx heliofleet-mcp --help
+```
+
+Commands: `align`, `position`, `fleet`, `events`, `geometry`, `link`, `status`, `connection`,
+`spaceweather`, `field`. Add `--compact` for one-line JSON. An error prints `{"error": ...}` on stderr
+and exits with status 2. With no command, the program serves MCP over stdio.
+
+## Python
+
+```python
+from heliofleet_mcp import Fleet, HelioField
+
+fleet = Fleet()
+fleet.find_alignments("radial", "psp", "solo", 10, "2026-11-19", max_windows=1)
+fleet.position("Solar Orbiter", "2026-11-19T12:00Z")
+fleet.viewing_geometry("psp", "2025-03-22T22:25Z")
+HelioField().magnetic_connection("psp", solar_wind_km_s=450)
+```
+
+The methods return the same dictionaries as the MCP tools. `Fleet` and `HelioField` take a
+`Store` or `FieldStore` for a different source, cache or offline checkout.
+
+## For assistants
+
+[`AGENTS.md`](https://github.com/sr-dash/heliofleet-mcp/blob/main/AGENTS.md) tells an assistant how to
+answer questions with this package in any environment: MCP, shell commands, Python, or plain web
+fetches of the published data. It also lists the conventions to keep, such as UTC times, the
+Stonyhurst sign, the alignment sampling and model caveats.
+[`llms.txt`](https://github.com/sr-dash/heliofleet-mcp/blob/main/llms.txt) is the short index.
+
 ## Example
 
 > When is the next Parker Solar Probe and Solar Orbiter radial alignment within 10° after 2026-11-19?
@@ -192,6 +236,7 @@ Full methods: <https://sr-dash.github.io/heliofleet/methods.html>.
   against Horizons.
 - `test_server_stdio.py`: the server started over stdio and called through the MCP client.
 - `test_data_sources.py`: site fetch and cache (marked `network`), and the local fallback.
+- `test_cli.py`: the one-shot commands, JSON errors and the Python API.
 - `test_heliofield.py`: the plugin's daily products, links as in HelioField's `llms.txt`, and
   HelioField's fleet positions and L0/B0 against HelioFleet's frames.
 
@@ -199,19 +244,22 @@ Full methods: <https://sr-dash.github.io/heliofleet/methods.html>.
 
 ## Releasing
 
-1. Set the new version in `src/heliofleet_mcp/__init__.py` and in both `version` fields of
-   `server.json`, and add a section to `CHANGELOG.md`. `python scripts/check_release.py` checks
+1. Set the new version in `src/heliofleet_mcp/__init__.py`, both `version` fields of `server.json`,
+   `CITATION.cff` and `.zenodo.json`, and add a section to `CHANGELOG.md`. `python scripts/check_release.py` checks
    that they agree.
 2. Commit, push, and publish a GitHub release tagged `vX.Y.Z`.
 3. The `release` workflow then runs the tests and builds the package. It publishes to PyPI by
    trusted publishing, attaches the files to the release, waits for PyPI, and publishes
-   `server.json` to the MCP Registry under `io.github.sr-dash/heliofleet-mcp`.
+   `server.json` to the MCP Registry under `io.github.sr-dash/heliofleet-mcp`. Zenodo archives the
+   release and mints a version DOI.
 
 The `tests` workflow validates the package and `server.json` on every push.
 
 ## Licence and citation
 
-MIT. When you use positions from this server, please cite HelioFleet: Dash, S. (2026). *HelioFleet:
+MIT. To cite this package, use [`CITATION.cff`](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff)
+or the Zenodo DOI in the badge above, which resolves to the latest release. When you use positions,
+please also cite HelioFleet: Dash, S. (2026). *HelioFleet:
 an interactive map of heliophysics spacecraft positions* [Computer software]. Zenodo.
 <https://doi.org/10.5281/zenodo.23328187>. Ephemerides: JPL Horizons. For coronal-field results,
 cite HelioField (<https://doi.org/10.5281/zenodo.23487231>) and the magnetogram (NSO/GONG or SDO/HMI).

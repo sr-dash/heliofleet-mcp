@@ -28,7 +28,7 @@ classifiers = [
 test = ["pytest>=7", "sunpy>=6", "astropy>=6"]
 
 [project.scripts]
-heliofleet-mcp = "heliofleet_mcp.server:main"
+heliofleet-mcp = "heliofleet_mcp.cli:main"
 
 [project.urls]
 HelioFleet = "https://sr-dash.github.io/heliofleet/"

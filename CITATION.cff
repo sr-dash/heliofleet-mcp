@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use heliofleet-mcp in your research, please cite it as below, together with HelioFleet (and HelioField for coronal-field results)."
+title: "heliofleet-mcp: spacecraft geometry and solar magnetic connectivity from HelioFleet and HelioField data"
+type: software
+authors:
+  - family-names: Dash
+    given-names: Soumyaranjan
+    orcid: "https://orcid.org/0000-0003-0103-6569"
+    affiliation: "National Solar Observatory"
+version: 0.1.1
+date-released: 2026-11-20
+url: "https://pypi.org/project/heliofleet-mcp/"
+repository-code: "https://github.com/sr-dash/heliofleet-mcp"
+license: MIT
+abstract: >-
+  heliofleet-mcp answers questions about heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind,
+  DSCOVR, IMAP, SOLAR-1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B and
+  MAVEN) from HelioFleet's published JPL Horizons ephemerides: positions in Stonyhurst, Carrington,
+  ecliptic and HEE frames, viewing geometry (B0, L0, apparent solar radius, light time), and windows
+  of radial alignment, quadrature, solar conjunction and magnetic connection. From HelioField's daily
+  PFSS products it adds the magnetic connection of each spacecraft to its source region, space-weather
+  indicators and coronal-field summaries. It is a Model Context Protocol server, a command line that
+  prints JSON, and a Python API. Every result carries a HelioFleet or HelioField link that reproduces
+  the view.
+keywords:
+  - heliophysics
+  - spacecraft ephemerides
+  - solar physics
+  - multi-spacecraft observations
+  - magnetic connectivity
+  - PFSS
+  - space weather
+  - JPL Horizons
+  - Model Context Protocol
+references:
+  - type: software
+    title: "HelioFleet: an interactive map of heliophysics spacecraft positions"
+    authors:
+      - family-names: Dash
+        given-names: Soumyaranjan
+    doi: 10.5281/zenodo.23328187
+    url: "https://sr-dash.github.io/heliofleet/"
+  - type: software
+    title: "HelioField"
+    authors:
+      - family-names: Dash
+        given-names: Soumyaranjan
+    doi: 10.5281/zenodo.23487231
+    url: "https://sr-dash.github.io/heliofield/"

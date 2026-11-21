@@ -64,6 +64,16 @@ def main() -> int:
     if "dynamic" not in project or "version" not in project["dynamic"]:
         bad.append("pyproject.toml should take the version from heliofleet_mcp.__version__")
 
+    cff = re.search(r"^version:\s*(\S+)", (ROOT / "CITATION.cff").read_text(), re.M)
+    if not cff or cff.group(1) != version:
+        bad.append(f"CITATION.cff version {cff and cff.group(1)} != {version}")
+    zen = json.loads((ROOT / ".zenodo.json").read_text())
+    if zen.get("version") != version:
+        bad.append(f".zenodo.json version {zen.get('version')} != {version}")
+    for f in ("AGENTS.md", "llms.txt"):
+        if not (ROOT / f).exists():
+            bad.append(f"{f} is missing")
+
     readme = (ROOT / "README.md").read_text()
     if not marker(NAME).search(readme):
         bad.append(f"README.md lacks the line 'mcp-name: {NAME}' (PyPI ownership check)")

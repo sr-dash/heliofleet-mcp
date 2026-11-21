@@ -1,7 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 (2026-11-20)
 
+- Command line: `heliofleet-mcp <command>` answers one question and prints the tool's JSON
+  (`align`, `position`, `fleet`, `events`, `geometry`, `link`, `status`, `connection`,
+  `spaceweather`, `field`). With no command it still serves MCP over stdio.
+- Python API: `from heliofleet_mcp import Fleet, HelioField`.
+- `AGENTS.md` and `llms.txt` describe how assistants can use the package with or without MCP.
+- Citation: `CITATION.cff`, `.zenodo.json` and a Zenodo DOI badge.
 - README: badges, and where the package is published (PyPI, MCP Registry, GitHub releases).
 - Package classifiers for Python 3.10 to 3.13.
 

@@ -1,0 +1,44 @@
+# heliofleet-mcp
+
+> heliofleet-mcp answers questions about heliophysics spacecraft from HelioFleet's and HelioField's published data. It covers where the spacecraft are, what each sees of the Sun, when two line up, and where each connects magnetically to the Sun. It is an MCP server (stdio), a command line that prints JSON, and a Python API. Free and open source (MIT), by Soumyaranjan Dash (National Solar Observatory). Every answer includes a HelioFleet or HelioField link that reproduces the view.
+
+Install and run with one command: `uvx heliofleet-mcp` (MCP server), or `uvx heliofleet-mcp <command>` (one answer as JSON). PyPI: `pip install heliofleet-mcp`. MCP Registry name: `io.github.sr-dash/heliofleet-mcp`.
+
+## Docs
+
+- [README](https://github.com/sr-dash/heliofleet-mcp/blob/main/README.md): tools, install, client setup, methods, tests.
+- [AGENTS.md](https://github.com/sr-dash/heliofleet-mcp/blob/main/AGENTS.md): how an assistant should use it (MCP, command line, Python or plain web fetches) and the conventions to keep when answering.
+- [CHANGELOG](https://github.com/sr-dash/heliofleet-mcp/blob/main/CHANGELOG.md)
+- [server.json](https://github.com/sr-dash/heliofleet-mcp/blob/main/server.json): the MCP Registry entry.
+
+## Commands (each prints the same JSON as the MCP tool in brackets)
+
+- `align A [B] --kind radial|quadrature|conjunction|connection --tol DEG --after T [--before T] [--next]` (find_alignments): alignment windows with start, end, best time and value, and a link that reruns the search.
+- `position BODY --time T` (get_position): distance, Stonyhurst and Carrington coordinates, ecliptic and HEE vectors, angle from Earth, light time, Parker-spiral footpoint.
+- `fleet --time T` (get_fleet_state): the same for every spacecraft and planet.
+- `events [--kind K] [--body B] [--space-weather]` (list_upcoming_events): perihelia, alignments, quadratures, conjunctions, eclipses; optionally DONKI flares, CMEs and storms.
+- `geometry OBSERVER --time T` (viewing_geometry): light time, RSUN_OBS, B0, HGLN_OBS, CRLN_OBS, km per arcsec.
+- `link --time T [--page sky --observer B]` (heliofleet_link)
+- `connection BODY [--wind V]` (magnetic_connection): HelioField PFSS footpoint, expansion factor, coronal-hole distance, WSA-type speed.
+- `spaceweather [--date D]` (space_weather), `field [--date D]` (coronal_field), `status` (data_status).
+
+Bodies: earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury venus mars. Names such as "Parker" also work. Times are UTC: ISO 8601, a date, `now`, or a Julian date.
+
+## Python
+
+```python
+from heliofleet_mcp import Fleet, HelioField
+Fleet().find_alignments("radial", "psp", "solo", 10, "2026-11-19", max_windows=1)
+HelioField().magnetic_connection("psp")
+```
+
+## Data and methods
+
+- HelioFleet (positions, frames, formulas): https://sr-dash.github.io/heliofleet/llms.txt and https://sr-dash.github.io/heliofleet/methods.html
+- HelioField (PFSS coronal field, connectivity, space weather): https://sr-dash.github.io/heliofield/llms.txt
+- Accuracy: Stonyhurst and Carrington coordinates agree with SunPy to 0.0004° (limit 0.005°). Alignment windows are identical to HelioFleet's page code.
+
+## Citation
+
+- This package: see [CITATION.cff](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff).
+- HelioFleet: https://doi.org/10.5281/zenodo.23328187. HelioField: https://doi.org/10.5281/zenodo.23487231.

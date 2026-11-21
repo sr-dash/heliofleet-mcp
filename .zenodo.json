@@ -1,0 +1,51 @@
+{
+  "title": "heliofleet-mcp: spacecraft geometry and solar magnetic connectivity from HelioFleet and HelioField data",
+  "upload_type": "software",
+  "description": "<p>heliofleet-mcp answers questions about heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B and MAVEN) from HelioFleet's published JPL Horizons ephemerides: positions in Stonyhurst, Carrington, ecliptic and HEE frames, viewing geometry (B0, L0, apparent solar radius, light time), and windows of radial alignment, quadrature, solar conjunction and magnetic connection. From HelioField's daily PFSS products it adds the magnetic connection of each spacecraft to its source region, space-weather indicators and coronal-field summaries. It is a Model Context Protocol server, a command line that prints JSON, and a Python API. Every result carries a HelioFleet or HelioField link that reproduces the view.</p><p>Install: <code>pip install heliofleet-mcp</code> or <code>uvx heliofleet-mcp</code> (<a href=\"https://pypi.org/project/heliofleet-mcp/\">PyPI</a>).</p>",
+  "creators": [
+    {
+      "name": "Dash, Soumyaranjan",
+      "affiliation": "National Solar Observatory",
+      "orcid": "0000-0003-0103-6569"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "heliophysics",
+    "spacecraft ephemerides",
+    "solar physics",
+    "multi-spacecraft observations",
+    "magnetic connectivity",
+    "PFSS",
+    "space weather",
+    "JPL Horizons",
+    "Model Context Protocol"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.23328187",
+      "relation": "isDerivedFrom",
+      "scheme": "doi",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "10.5281/zenodo.23487231",
+      "relation": "references",
+      "scheme": "doi",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://pypi.org/project/heliofleet-mcp/",
+      "relation": "isIdenticalTo",
+      "scheme": "url",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://github.com/sr-dash/heliofleet-mcp/blob/main/README.md",
+      "relation": "isDocumentedBy",
+      "scheme": "url",
+      "resource_type": "other"
+    }
+  ],
+  "version": "0.1.1"
+}

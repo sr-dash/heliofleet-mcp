@@ -336,6 +336,41 @@ class Fleet:
             res["space_weather"] = {"source": ev.get("source"), "criteria": ev.get("criteria"), "events": sw}
         return res
 
+    # ---------- links and status ----------
+
+    def link(self, time=None, page="map", *, tab=None, observer="earth", frame=None, view=None, zoom=None,
+             hide=None, spirals=None, solar_wind_km_s=None, spot_system=None, spot_lon=None, spot_lat=None,
+             align_kind=None, align_a=None, align_b=None, align_tolerance_deg=None, align_from=None,
+             align_to=None):
+        """A HelioFleet map or sky-view URL that reproduces a view."""
+        jd = parse_time(time)
+        if page == "sky":
+            return {"link": sky_link(jd, resolve(observer), zoom=zoom)}
+        if page != "map":
+            raise ValueError("page must be map or sky")
+        spot = None
+        if spot_system and spot_lon is not None and spot_lat is not None:
+            spot = {"sys": spot_system, "lon": spot_lon, "lat": spot_lat}
+            tab = tab or "vis"
+        align = None
+        if align_kind:
+            if not (align_a and align_from and align_to):
+                raise ValueError("an alignment link needs align_a, align_from and align_to")
+            align = {"kind": align_kind, "a": resolve(align_a), "b": resolve(align_b) if align_b else "earth",
+                     "tol": align_tolerance_deg or ALIGN_KINDS[align_kind]["tol"],
+                     "from": date_str(parse_time(align_from)), "to": date_str(parse_time(align_to))}
+        url = map_link(jd, tab=tab, align=align, spot=spot, frame=frame, view=view, zoom=zoom,
+                       hide=[resolve(h) for h in hide] if hide else None, spirals=spirals, wind=solar_wind_km_s)
+        return {"link": url}
+
+    def data_status(self):
+        """Loaded data release, where it came from, and each body's ephemeris span."""
+        m = self.store.manifest()
+        return {**self.data_info(),
+                "bodies": {k: {"start_utc": iso(v["start"]), "end_utc": iso(v["end"]), "step_days": v["step"],
+                               "units": v["units"], "center": v["center"]} for k, v in m["bodies"].items()},
+                "link": "https://sr-dash.github.io/heliofleet/methods.html"}
+
     # ---------- misc ----------
 
     def data_info(self):
