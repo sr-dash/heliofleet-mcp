@@ -42,6 +42,10 @@ the Sun. It covers using this repository to answer such questions and working on
    alignments, quadratures and conjunctions is `https://sr-dash.github.io/heliofleet/data/upcoming.json`.
    HelioField's guide is https://sr-dash.github.io/heliofield/llms.txt.
 
+To install these instructions as a reusable skill, use
+[`skills/heliofleet/SKILL.md`](https://github.com/sr-dash/heliofleet-mcp/blob/main/skills/heliofleet/SKILL.md)
+(an [Agent Skill](https://agentskills.io): `npx skills add sr-dash/heliofleet-mcp`).
+
 ## Commands and tools
 
 | Question | Command | MCP tool |

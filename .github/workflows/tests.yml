@@ -32,6 +32,26 @@ jobs:
         env:
           HELIOFLEET_TEST_SOURCE: web
 
+  plugins:
+    # The skill and the plugin manifests stay valid for each client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Skill (agentskills.io reference validator)
+        run: |
+          pip install "skills-ref @ git+https://github.com/agentskills/agentskills#subdirectory=skills-ref"
+          skills-ref validate skills/heliofleet
+      - name: Agent Plugins manifest (plugin.json) against its JSON schema
+        run: |
+          pip install jsonschema
+          curl -fsSL https://agent-plugins.org/schemas/1.0.0/plugin.schema.json -o /tmp/plugin.schema.json
+          python -c "import json, jsonschema; jsonschema.validate(json.load(open('plugin.json')), json.load(open('/tmp/plugin.schema.json'))); print('plugin.json valid')"
+      - name: Names and versions in step with the package
+        run: python scripts/check_release.py
+
   lint:
     runs-on: ubuntu-latest
     steps:

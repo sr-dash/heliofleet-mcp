@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Agent Skill `skills/heliofleet/SKILL.md` (agentskills.io format) with a reference of the output
+  fields: which command answers which question and the rules for reporting results.
+- Plugins: `.claude-plugin/` (plugin and marketplace; skill plus the MCP server from `.mcp.json`),
+  `.cursor-plugin/plugin.json`, and an Agent Plugins `plugin.json` (skill only). CI validates the
+  skill and the Agent Plugins manifest; `check_release.py` keeps their names and versions in step.
+- The `list_upcoming_events` tool description gives HelioFleet's current DONKI thresholds (M1+
+  flares, CMEs from 500 km/s, G1+ storms).
 - The documentation site (https://sr-dash.github.io/heliofleet-mcp/) moves from pdoc to MkDocs
   Material: getting started, MCP tools, command line, Python, methods, and an API reference built
   from the docstrings with mkdocstrings. Page descriptions, Open Graph and Twitter cards,

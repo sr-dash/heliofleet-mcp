@@ -166,6 +166,24 @@ fetches of the published data. It also lists the conventions to keep, such as UT
 Stonyhurst sign, the alignment sampling and model caveats.
 [`llms.txt`](https://github.com/sr-dash/heliofleet-mcp/blob/main/llms.txt) is the short index.
 
+## Skill and plugins
+
+[`skills/heliofleet/SKILL.md`](https://github.com/sr-dash/heliofleet-mcp/blob/main/skills/heliofleet/SKILL.md)
+is an [Agent Skill](https://agentskills.io): it teaches an assistant which `heliofleet-mcp` command
+answers which question and how to report the result. It needs only a shell with `uvx` (or the
+package installed), no MCP set-up, and works in any assistant that reads Agent Skills.
+
+| Where | Install |
+| --- | --- |
+| Any assistant that reads Agent Skills ([skills.sh](https://skills.sh)) | `npx skills add sr-dash/heliofleet-mcp` |
+| Claude Code (plugin: the skill and the MCP server) | `/plugin marketplace add sr-dash/heliofleet-mcp`, then `/plugin install heliofleet@sr-dash` |
+| Cursor (plugin: the skill and the MCP server) | from the Cursor Marketplace once listed, or copy `skills/heliofleet` to `~/.cursor/skills/` |
+| Codex | copy `skills/heliofleet` to `~/.agents/skills/` (or `.agents/skills/` in a project) |
+
+The plugin manifests are `.claude-plugin/` (with `marketplace.json`, so this repository is its own
+marketplace), `.cursor-plugin/plugin.json`, and the [Agent Plugins](https://agent-plugins.org)
+`plugin.json` at the root. CI validates the skill and the Agent Plugins manifest on each push.
+
 ## Example
 
 > When is the next Parker Solar Probe and Solar Orbiter radial alignment within 10° after 2026-11-19?
@@ -260,7 +278,7 @@ which also says when a contribution is not accepted, and the
 ## Releasing
 
 1. Set the new version in `src/heliofleet_mcp/__init__.py`, both `version` fields of `server.json`,
-   `CITATION.cff` and `.zenodo.json`, and add a section to `CHANGELOG.md`. `python scripts/check_release.py` checks
+   `CITATION.cff`, `.zenodo.json` and the three plugin manifests, and add a section to `CHANGELOG.md`. `python scripts/check_release.py` checks
    that they agree.
 2. Commit, push, and publish a GitHub release tagged `vX.Y.Z`.
 3. The `release` workflow then runs the tests and builds the package. It publishes to PyPI by

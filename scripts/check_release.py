@@ -74,6 +74,25 @@ def main() -> int:
         if not (ROOT / f).exists():
             bad.append(f"{f} is missing")
 
+    # Skill and plugin manifests: same name and version as the package
+    for f in (".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", "plugin.json"):
+        m = json.loads((ROOT / f).read_text())
+        if m.get("name") != "heliofleet":
+            bad.append(f"{f} name {m.get('name')!r} != 'heliofleet'")
+        if m.get("version") != version:
+            bad.append(f"{f} version {m.get('version')} != {version}")
+    mkt = json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())
+    if [p.get("name") for p in mkt.get("plugins", [])] != ["heliofleet"]:
+        bad.append(".claude-plugin/marketplace.json should list the heliofleet plugin")
+    if "heliofleet" not in json.loads((ROOT / ".mcp.json").read_text()).get("mcpServers", {}):
+        bad.append(".mcp.json should define the heliofleet server")
+    skill = (ROOT / "skills/heliofleet/SKILL.md").read_text()
+    front = re.match(r"---\n(.*?)\n---\n", skill, re.S)
+    if not front or not re.search(r"^name: heliofleet$", front.group(1), re.M):
+        bad.append("skills/heliofleet/SKILL.md: frontmatter name must be 'heliofleet' (the folder name)")
+    elif len(skill.splitlines()) > 500:
+        bad.append("skills/heliofleet/SKILL.md is over 500 lines")
+
     readme = (ROOT / "README.md").read_text()
     if not marker(NAME).search(readme):
         bad.append(f"README.md lacks the line 'mcp-name: {NAME}' (PyPI ownership check)")

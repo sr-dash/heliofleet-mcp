@@ -105,6 +105,7 @@ nav:
       - MCP tools: tools.md
       - Command line: command-line.md
       - Python: python.md
+      - Skill and plugins: skill.md
       - Methods and data: methods.md
   - API reference:
       - api/index.md

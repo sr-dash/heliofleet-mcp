@@ -1,0 +1,22 @@
+{
+  "name": "sr-dash",
+  "description": "Heliophysics tools by Soumyaranjan Dash (National Solar Observatory).",
+  "owner": {
+    "name": "Soumyaranjan Dash",
+    "url": "https://sr-dash.github.io/"
+  },
+  "plugins": [
+    {
+      "name": "heliofleet",
+      "source": "./",
+      "description": "Heliophysics spacecraft geometry: positions, alignments, conjunctions, viewing geometry (B0, L0) and PFSS magnetic connectivity for Parker Solar Probe, Solar Orbiter, STEREO and more, from JPL Horizons.",
+      "category": "science",
+      "tags": [
+        "heliophysics",
+        "spacecraft",
+        "space-weather",
+        "astronomy"
+      ]
+    }
+  ]
+}

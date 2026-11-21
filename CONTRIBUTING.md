@@ -67,6 +67,16 @@ does. CI runs them on Linux (Python 3.10 to 3.14), macOS and Windows.
 - Times are UTC; angles are degrees; distances are au unless the name says otherwise.
 - Keep the MCP tools, the command line and the Python API in step: they return the same JSON.
 
+## Skill and plugins
+
+- `skills/heliofleet/SKILL.md` follows the [Agent Skills](https://agentskills.io/specification)
+  format: the frontmatter `name` matches the folder, the description stays under 1024 characters and
+  the body under 500 lines. Keep its command table in step with the command line.
+- The plugin manifests (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `plugin.json`)
+  carry the package version; `python scripts/check_release.py` checks names and versions.
+- Validate the skill with `skills-ref validate skills/heliofleet` (CI does too), and each client's
+  manifest with that client's own plugin validator before a submission.
+
 ## Commits, pull requests and releases
 
 - One topic per pull request, with a short description of what changed and why.

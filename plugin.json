@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "heliofleet",
+  "version": "0.2.0",
+  "description": "Heliophysics spacecraft geometry: positions, alignments, conjunctions, viewing geometry (B0, L0) and PFSS magnetic connectivity for Parker Solar Probe, Solar Orbiter, STEREO and more, from JPL Horizons.",
+  "author": {
+    "name": "Soumyaranjan Dash",
+    "url": "https://sr-dash.github.io/"
+  },
+  "homepage": "https://sr-dash.github.io/heliofleet-mcp/",
+  "repository": "https://github.com/sr-dash/heliofleet-mcp",
+  "license": "MIT",
+  "keywords": [
+    "heliophysics",
+    "solar-physics",
+    "spacecraft",
+    "ephemeris",
+    "jpl-horizons",
+    "parker-solar-probe",
+    "solar-orbiter",
+    "space-weather",
+    "pfss",
+    "astronomy",
+    "mcp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "HelioFleet",
+        "shortDescription": "Where heliophysics spacecraft are and when they line up",
+        "longDescription": "Heliophysics spacecraft geometry: positions, alignments, conjunctions, viewing geometry (B0, L0) and PFSS magnetic connectivity for Parker Solar Probe, Solar Orbiter, STEREO and more, from JPL Horizons.",
+        "developerName": "Soumyaranjan Dash",
+        "category": "Research",
+        "websiteURL": "https://sr-dash.github.io/heliofleet-mcp/"
+      }
+    }
+  }
+}

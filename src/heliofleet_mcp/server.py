@@ -67,8 +67,8 @@ def list_upcoming_events(start: str = "now", end: str | None = None, kind: str |
     """HelioFleet's event calendar between two UTC times (default: the next year): perihelia,
     alignments, quadratures, solar conjunctions and total solar eclipses, each with a link.
     kind filters by a comma list (perihelion, alignment, quadrature, conjunction, eclipse); body
-    keeps events involving that body. include_space_weather adds NASA DONKI flares (M5+), fast
-    CMEs (1000 km/s+) and G3+ storms in the range."""
+    keeps events involving that body. include_space_weather adds NASA DONKI flares (M1+), CMEs
+    (500 km/s+) and geomagnetic storms (G1+) in the range."""
     return fleet.upcoming_events(start, end, kind, body, include_space_weather)
 
 

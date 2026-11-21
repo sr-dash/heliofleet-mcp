@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "heliofleet": {
+      "command": "uvx",
+      "args": [
+        "heliofleet-mcp"
+      ]
+    }
+  }
+}
