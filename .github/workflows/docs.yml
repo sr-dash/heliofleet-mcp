@@ -28,7 +28,7 @@ jobs:
       - run: pip install ".[docs]"
       - name: Publish llms.txt with the site
         run: cp llms.txt docs/llms.txt
-      - name: Build (strict: broken links and references fail the build)
+      - name: "Build (strict: broken links and references fail the build)"
         run: mkdocs build --strict
         env:
           NO_MKDOCS_2_WARNING: "1"
