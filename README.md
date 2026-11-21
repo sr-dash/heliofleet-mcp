@@ -242,7 +242,15 @@ Full methods: <https://sr-dash.github.io/heliofleet/methods.html>.
 - `test_heliofield.py`: the plugin's daily products, links as in HelioField's `llms.txt`, and
   HelioField's fleet positions and L0/B0 against HelioFleet's frames.
 
-`HELIOFLEET_TEST_SOURCE=web` runs the suite on the live sites instead of local checkouts.
+`HELIOFLEET_TEST_SOURCE=web` runs the suite on the live sites instead of local checkouts. CI runs it
+on Linux (Python 3.10 to 3.14), macOS and Windows, reports coverage (`pytest --cov`), and checks the
+code style with ruff (`ruff check src tests scripts`).
+
+## Contributing
+
+Reports, ideas and pull requests are welcome: see [CONTRIBUTING.md](https://github.com/sr-dash/heliofleet-mcp/blob/main/CONTRIBUTING.md),
+which also says when a contribution is not accepted, and the
+[code of conduct](https://github.com/sr-dash/heliofleet-mcp/blob/main/CODE_OF_CONDUCT.md) (Contributor Covenant 2.1).
 
 ## Releasing
 

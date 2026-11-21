@@ -7,3 +7,5 @@ build/
 dist/
 mcp-publisher
 .mcpregistry_*
+.coverage
+coverage.xml

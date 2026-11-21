@@ -11,19 +11,36 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.10", "3.13"]
+        include:
+          - { os: ubuntu-latest, python: "3.10" }
+          - { os: ubuntu-latest, python: "3.12" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: ubuntu-latest, python: "3.14", coverage: true }
+          - { os: macos-latest, python: "3.14" }
+          - { os: windows-latest, python: "3.14" }
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -e '.[test]' jplephem
-      - run: python -m pytest -q
+      - run: pip install -e ".[test]" jplephem
+      - run: python -m pytest -q ${{ matrix.coverage && '--cov --cov-report=term --cov-report=xml' || '' }}
         env:
           HELIOFLEET_TEST_SOURCE: web
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: pip install ruff
+      - run: ruff check src tests scripts
 
   metadata:
     # Package and MCP Registry metadata stay consistent and valid

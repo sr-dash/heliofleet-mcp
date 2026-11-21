@@ -283,7 +283,8 @@ class Fleet:
             "windows": out_windows,
             "best_value_meaning": "smallest separation (radial, connection), offset from 90 deg (quadrature) "
                                   "or angle from Sun centre seen from Earth (conjunction) in the window",
-            "resolution_note": f"Window edges and best times are at the {step * 24:g}-hour sample grid, as on the page.",
+            "resolution_note": f"Window edges and best times are at the {step * 24:g}-hour sample grid, "
+                               "as on the page.",
             "link": map_link(jd0, align=align_q, wind=wind if kind == "connection" else None),
         }
         if max_windows:
