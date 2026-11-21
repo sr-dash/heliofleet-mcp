@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 (2026-11-20)
+
+- Package metadata only, no code changes: more PyPI and Zenodo keywords (missions, coordinate
+  systems, alignment kinds, PFSS), so searches for those terms find the package.
+- The PyPI page picks up the current README: demo GIF, citation with the Zenodo DOI, and the
+  command-line and assistant sections.
+- `glama.json` names the maintainer for the Glama directory.
+
 ## 0.1.1 (2026-11-20)
 
 - Command line: `heliofleet-mcp <command>` answers one question and prints the tool's JSON

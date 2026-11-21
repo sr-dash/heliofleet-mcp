@@ -11,7 +11,32 @@ license = "MIT"
 authors = [{ name = "Soumyaranjan Dash" }]
 requires-python = ">=3.10"
 dependencies = ["mcp>=1.2"]
-keywords = ["heliophysics", "spacecraft", "ephemeris", "solar", "mcp", "sunpy", "pfss"]
+keywords = [
+  "heliophysics",
+  "solar physics",
+  "spacecraft",
+  "ephemeris",
+  "JPL Horizons",
+  "Parker Solar Probe",
+  "Solar Orbiter",
+  "STEREO",
+  "heliographic coordinates",
+  "Carrington longitude",
+  "Stonyhurst",
+  "spacecraft alignment",
+  "quadrature",
+  "solar conjunction",
+  "perihelion",
+  "PFSS",
+  "magnetic connectivity",
+  "Parker spiral",
+  "solar wind",
+  "space weather",
+  "sunpy",
+  "mcp",
+  "mcp-server",
+  "model context protocol",
+]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",

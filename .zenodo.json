@@ -19,7 +19,24 @@
     "PFSS",
     "space weather",
     "JPL Horizons",
-    "Model Context Protocol"
+    "Model Context Protocol",
+    "spacecraft",
+    "ephemeris",
+    "Parker Solar Probe",
+    "Solar Orbiter",
+    "STEREO",
+    "heliographic coordinates",
+    "Carrington longitude",
+    "Stonyhurst",
+    "spacecraft alignment",
+    "quadrature",
+    "solar conjunction",
+    "perihelion",
+    "Parker spiral",
+    "solar wind",
+    "sunpy",
+    "mcp",
+    "mcp-server"
   ],
   "related_identifiers": [
     {
@@ -47,5 +64,5 @@
       "resource_type": "other"
     }
   ],
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
