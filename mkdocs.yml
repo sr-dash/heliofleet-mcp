@@ -121,6 +121,7 @@ nav:
       - Contributing: contributing.md
       - Citing: citing.md
       - Changelog: changelog.md
+      - Privacy: privacy.md
 
 markdown_extensions:
   - abbr
