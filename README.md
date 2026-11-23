@@ -4,6 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/heliofleet-mcp)](https://pypi.org/project/heliofleet-mcp/)
 [![MCP Registry](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fregistry.modelcontextprotocol.io%2Fv0%2Fservers%2Fio.github.sr-dash%252Fheliofleet-mcp%2Fversions%2Flatest&query=%24.server.version&label=MCP%20Registry&color=blue)](https://registry.modelcontextprotocol.io/v0/servers/io.github.sr-dash%2Fheliofleet-mcp/versions/latest)
+[![sr-dash/heliofleet-mcp MCP server](https://glama.ai/mcp/servers/sr-dash/heliofleet-mcp/badges/score.svg)](https://glama.ai/mcp/servers/sr-dash/heliofleet-mcp)
 [![API reference](https://img.shields.io/badge/docs-API%20reference-blue)](https://sr-dash.github.io/heliofleet-mcp/)
 [![tests](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/tests.yml/badge.svg)](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/tests.yml)
 [![release](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/release.yml/badge.svg)](https://github.com/sr-dash/heliofleet-mcp/actions/workflows/release.yml)
