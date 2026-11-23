@@ -1,7 +1,7 @@
 {
   "title": "heliofleet-mcp: spacecraft geometry and solar magnetic connectivity from HelioFleet and HelioField data",
   "upload_type": "software",
-  "description": "<p>heliofleet-mcp answers questions about heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B and MAVEN) from HelioFleet's published JPL Horizons ephemerides: positions in Stonyhurst, Carrington, ecliptic and HEE frames, viewing geometry (B0, L0, apparent solar radius, light time), and windows of radial alignment, quadrature, solar conjunction and magnetic connection. From HelioField's daily PFSS products it adds the magnetic connection of each spacecraft to its source region, space-weather indicators and coronal-field summaries. It is a Model Context Protocol server, a command line that prints JSON, and a Python API. Every result carries a HelioFleet or HelioField link that reproduces the view.</p><p>Install: <code>pip install heliofleet-mcp</code> or <code>uvx heliofleet-mcp</code> (<a href=\"https://pypi.org/project/heliofleet-mcp/\">PyPI</a>).</p>",
+  "description": "<p>heliofleet-mcp answers questions about heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B, MAVEN, MESSENGER, Venus Express, Juno, Rosetta, JUICE, Europa Clipper and Psyche) from HelioFleet's published JPL Horizons ephemerides: positions in Stonyhurst, Carrington, ecliptic and HEE frames, viewing geometry (B0, L0, apparent solar radius, light time), and windows of radial alignment, quadrature, solar conjunction and magnetic connection. From HelioField's daily PFSS products it adds the magnetic connection of each spacecraft to its source region, space-weather indicators and coronal-field summaries. It is a Model Context Protocol server, a command line that prints JSON, and a Python API. Every result carries a HelioFleet or HelioField link that reproduces the view.</p><p>Install: <code>pip install heliofleet-mcp</code> or <code>uvx heliofleet-mcp</code> (<a href=\"https://pypi.org/project/heliofleet-mcp/\">PyPI</a>).</p>",
   "creators": [
     {
       "name": "Dash, Soumyaranjan",
@@ -64,5 +64,5 @@
       "resource_type": "other"
     }
   ],
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

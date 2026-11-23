@@ -27,7 +27,8 @@ EPILOG = """examples:
   heliofleet-mcp spaceweather
 
 Times are UTC (ISO 8601, a date, 'now', or a Julian date). Bodies: earth sdo soho aditya ace wind
-dscovr imap swfo cgo solo psp bepi sta stb maven mercury venus mars, or names such as "Parker".
+dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche
+mercury venus mars, or names such as "Parker".
 With no command, the MCP server runs over stdio."""
 
 

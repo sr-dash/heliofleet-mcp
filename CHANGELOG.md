@@ -1,7 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 (2026-11-23)
 
+Matches HelioFleet 1.2.0.
+
+- Seven new bodies, as in HelioFleet 1.2.0: MESSENGER (`messenger`, to 2015-04-30), Venus Express
+  (`vex`, contact lost 2014-11-28, ended 2014-12-16), Juno (`juno`), Rosetta (`rosetta`, to
+  2016-09-30), JUICE (`juice`), Europa Clipper (`clipper`) and Psyche (`psyche`), with the usual
+  names and aliases ("Venus Express", "Europa Clipper"). Positions, viewing geometry, alignment
+  searches and spot visibility include them; ended missions report `ended` after their end date.
 - Agent Skill `skills/heliofleet/SKILL.md` (agentskills.io format) with a reference of the output
   fields: which command answers which question and the rules for reporting results.
 - Plugins: `.claude-plugin/` (plugin and marketplace; skill plus the MCP server from `.mcp.json`),

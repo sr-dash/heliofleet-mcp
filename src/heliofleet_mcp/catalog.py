@@ -1,7 +1,8 @@
 """Bodies HelioFleet draws, with the fields the geometry needs (from js/catalog.js)."""
 
 SPACECRAFT = ["sdo", "soho", "aditya", "ace", "wind", "dscovr", "imap", "swfo", "cgo",
-              "solo", "psp", "bepi", "sta", "stb", "maven"]
+              "solo", "psp", "bepi", "sta", "stb", "maven",
+              "messenger", "vex", "juno", "rosetta", "juice", "clipper", "psyche"]
 PLANETS = ["mercury", "venus", "mars"]
 SKY_OBSERVERS = ["earth", "solo", "psp", "bepi", "sta", "stb", "maven"]
 
@@ -38,6 +39,19 @@ BODIES = {
             "lost": "2014-10-01T00:00Z", "ended": "2018-10-17T00:00Z"},
     "maven": {"name": "MAVEN", "short": "MAVEN", "kind": "sc", "hid": "-202", "launch": "2013-11-18T18:28Z",
               "lost": "2025-12-06T00:00Z"},
+    # Planetary and cruise missions used as in situ solar-wind observers (HelioFleet 1.2.0)
+    "messenger": {"name": "MESSENGER", "short": "MESSENGER", "kind": "sc", "hid": "-236",
+                  "launch": "2004-08-03T06:15Z", "ended": "2015-04-30T19:26Z"},
+    "vex": {"name": "Venus Express", "short": "Venus Express", "kind": "sc", "hid": "-248",
+            "launch": "2005-11-09T03:33Z", "lost": "2014-11-28T00:00Z", "ended": "2014-12-16T00:00Z"},
+    "juno": {"name": "Juno", "short": "Juno", "kind": "sc", "hid": "-61", "launch": "2011-08-05T16:25Z"},
+    "rosetta": {"name": "Rosetta", "short": "Rosetta", "kind": "sc", "hid": "-226",
+                "launch": "2004-03-02T07:17Z", "ended": "2016-09-30T10:39Z"},
+    "juice": {"name": "JUICE (Jupiter Icy Moons Explorer)", "short": "JUICE", "kind": "sc", "hid": "-28",
+              "launch": "2023-04-14T12:14Z"},
+    "clipper": {"name": "Europa Clipper", "short": "Europa Clipper", "kind": "sc", "hid": "-159",
+                "launch": "2024-10-14T16:06Z"},
+    "psyche": {"name": "Psyche", "short": "Psyche", "kind": "sc", "hid": "-255", "launch": "2023-10-13T14:19Z"},
     "mercury": {"name": "Mercury", "kind": "planet", "hid": "199"},
     "venus": {"name": "Venus", "kind": "planet", "hid": "299"},
     "mars": {"name": "Mars", "kind": "planet", "hid": "499"},
@@ -51,6 +65,8 @@ ALIASES = {
     "bepicolombo": "bepi", "aditya-l1": "aditya", "aditya l1": "aditya",
     "solar-1": "swfo", "solar1": "swfo", "swfo-l1": "swfo", "carruthers": "cgo",
     "deep space climate observatory": "dscovr", "solar dynamics observatory": "sdo",
+    "venus express": "vex", "venusexpress": "vex", "europa clipper": "clipper", "europaclipper": "clipper",
+    "jupiter icy moons explorer": "juice",
 }
 
 

@@ -24,7 +24,7 @@ Install and run with one command: `uvx heliofleet-mcp` (MCP server), or `uvx hel
 - `connection BODY [--wind V]` (magnetic_connection): HelioField PFSS footpoint, expansion factor, coronal-hole distance, WSA-type speed.
 - `spaceweather [--date D]` (space_weather), `field [--date D]` (coronal_field), `status` (data_status).
 
-Bodies: earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury venus mars. Names such as "Parker" also work. Times are UTC: ISO 8601, a date, `now`, or a Julian date.
+Bodies: earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury venus mars. Names such as "Parker" also work. Times are UTC: ISO 8601, a date, `now`, or a Julian date.
 
 ## Python
 

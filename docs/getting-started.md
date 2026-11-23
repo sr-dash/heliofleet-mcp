@@ -92,7 +92,7 @@ All settings are environment variables, which an MCP client entry can set with `
 
 ## Bodies and times
 
-Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury
+Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury
 venus mars`. Common names also work, such as "Parker", "Solar Orbiter" and "STEREO-A".
 
 Times are UTC: ISO 8601 (`2026-11-19T12:00Z`, `2026-11-19`), `now`, or a Julian date.

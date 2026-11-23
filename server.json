@@ -3,7 +3,7 @@
   "name": "io.github.sr-dash/heliofleet-mcp",
   "title": "HelioFleet",
   "description": "Heliophysics spacecraft positions, alignments and solar magnetic connectivity from JPL ephemerides",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "websiteUrl": "https://sr-dash.github.io/heliofleet/",
   "repository": {
     "url": "https://github.com/sr-dash/heliofleet-mcp",
@@ -14,7 +14,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "heliofleet-mcp",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"

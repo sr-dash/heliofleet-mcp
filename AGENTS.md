@@ -70,7 +70,7 @@ Alignment kinds:
 ## Conventions to keep when you answer
 
 - Times are UTC. Inputs may be ISO 8601 (`2026-11-19T12:00Z`), a date, `now`, or a Julian date.
-- Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury
+- Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury
   venus mars`. Names such as "Parker", "Solar Orbiter" and "STEREO-A" also work.
 - Stonyhurst longitude is measured from the Sun–Earth line, positive to the west. Carrington
   longitude is as seen from Earth, one light time in the past, as in SunPy. Viewing geometry uses the

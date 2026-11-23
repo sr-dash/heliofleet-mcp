@@ -298,7 +298,7 @@ class Fleet:
         --------
         >>> s = Fleet().fleet_state("2025-03-22T22:25Z")
         >>> len(s["bodies"]), [b["body"] for b in s["not_shown"]]
-        (15, ['imap', 'swfo', 'cgo', 'stb'])
+        (19, ['imap', 'swfo', 'cgo', 'stb', 'messenger', 'vex', 'rosetta'])
         """
         jd = parse_time(time)
         earth = self._earth_or_raise(jd)

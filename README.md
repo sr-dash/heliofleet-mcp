@@ -54,7 +54,7 @@ HelioField page computes any date since 2010-05-01 in the browser. HelioField's 
 of the fleet agree with HelioFleet's to 0.002°, and a test checks this. Set
 `HELIOFLEET_MCP_PLUGINS=none` to serve the HelioFleet tools alone.
 
-Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury venus mars`.
+Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury venus mars`.
 Common names also work, such as "Parker", "Solar Orbiter" and "STEREO-A". Times are UTC in ISO 8601
 (`2026-11-19T12:00Z`, `2026-11-19`), `now`, or a Julian date.
 

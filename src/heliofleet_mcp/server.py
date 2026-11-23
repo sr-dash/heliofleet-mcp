@@ -15,9 +15,10 @@ from .geometry import Fleet
 INSTRUCTIONS = """\
 Positions and viewing geometry of heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind,
 DSCOVR, IMAP, SOLAR-1, Carruthers, Solar Orbiter, Parker Solar Probe, BepiColombo, STEREO-A/B,
-MAVEN) and the inner planets, from HelioFleet's JPL Horizons ephemerides (2010 to about 2030).
+MAVEN, MESSENGER, Venus Express, Juno, Rosetta, JUICE, Europa Clipper, Psyche) and the inner planets, from HelioFleet's JPL Horizons ephemerides (2010 to about 2030).
 Times are UTC (ISO 8601, e.g. 2026-11-19T12:00Z, or 'now'). Body keys: earth, sdo, soho, aditya,
-ace, wind, dscovr, imap, swfo, cgo, solo, psp, bepi, sta, stb, maven, mercury, venus, mars
+ace, wind, dscovr, imap, swfo, cgo, solo, psp, bepi, sta, stb, maven, messenger, vex, juno,
+rosetta, juice, clipper, psyche, mercury, venus, mars
 (common names such as 'Parker' or 'Solar Orbiter' also work). Every result carries a HelioFleet
 link that reproduces the view in the browser; give it to the user with the numbers.
 With the HelioField plugin (on by default), magnetic_connection, space_weather, coronal_field and

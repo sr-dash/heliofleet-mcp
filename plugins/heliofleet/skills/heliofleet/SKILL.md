@@ -65,7 +65,7 @@ year from `--after` (default now). `--next` returns only the first window; `--ma
 
 ## Bodies and times
 
-- Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven mercury
+- Bodies: `earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury
   venus mars`. Names also work: "Parker", "Solar Orbiter", "STEREO-A", "BepiColombo".
 - Times are UTC: ISO 8601 (`2026-11-19T12:00Z`), a date (`2026-11-19`, midnight UTC), `now`, or a
   Julian date. Convert the user's local time to UTC first and say so.
@@ -81,7 +81,7 @@ year from `--after` (default now). `--next` returns only the first window; `--ma
 2. Stonyhurst longitude (`hgs_lon_deg`) is measured from the Sun–Earth line, positive to the west.
    Carrington longitude is as seen from Earth one light time earlier, as in SunPy; viewing geometry
    uses the observer's own light time (`l0_deg`, CRLN_OBS).
-3. Check `status`: `lost` means a prediction after contact was lost (STEREO-B, MAVEN); `approx` means
+3. Check `status`: `lost` means a prediction after contact was lost (STEREO-B, MAVEN, Venus Express); `approx` means
    shown at Earth past the end of its ephemeris; `prelaunch` and `ended` have no position. Say so.
 4. HelioField results (`connection`, `spaceweather`, `field`) are PFSS model output with indicative
    WSA-type speeds, not observations or an official forecast (NOAA SWPC issues those). Say so.

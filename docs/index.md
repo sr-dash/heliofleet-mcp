@@ -98,7 +98,8 @@ JPL Horizons gives 6.18° at the same hour.
 ## Spacecraft covered
 
 SDO, SOHO, Aditya-L1, ACE, Wind, DSCOVR, IMAP, SOLAR-1 (SWFO-L1), Carruthers, Solar Orbiter,
-Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B and MAVEN, with Earth, Mercury, Venus and Mars,
+Parker Solar Probe, BepiColombo, STEREO-A, STEREO-B, MAVEN, MESSENGER, Venus Express, Juno, Rosetta, JUICE,
+Europa Clipper and Psyche, with Earth, Mercury, Venus and Mars,
 from 2010 to about 2030. Ephemerides are refreshed monthly from JPL Horizons; HelioField's PFSS
 products are daily.
 
