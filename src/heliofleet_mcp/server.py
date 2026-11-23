@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
+
+from pydantic import Field
 
 try:  # mcp >= 2
     from mcp.server.mcpserver import MCPServer as _Server
 except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server
 
+from ._tools import tool
 from .geometry import Fleet
 
 INSTRUCTIONS = """\
@@ -22,82 +25,151 @@ ace, wind, dscovr, imap, swfo, cgo, solo, psp, bepi, sta, stb, maven, messenger,
 rosetta, juice, clipper, psyche, mercury, venus, mars
 (common names such as 'Parker' or 'Solar Orbiter' also work). Every result carries a HelioFleet
 link that reproduces the view in the browser; give it to the user with the numbers.
-With the HelioField plugin (on by default), magnetic_connection, space_weather, coronal_field and
-heliofield_link add the PFSS coronal field and magnetic connectivity from HelioField's daily products."""
+Which tool: one body -> get_position; every body -> get_fleet_state; what an observer sees of the
+Sun -> get_viewing_geometry; when a configuration happens -> find_alignments (any search) or
+list_upcoming_events (the precomputed calendar); a link only -> build_heliofleet_link.
+With the HelioField plugin (on by default), get_magnetic_connection, get_space_weather,
+get_coronal_field and build_heliofield_link add the PFSS coronal field and magnetic connectivity
+from HelioField's daily products. All tools are read-only."""
 
 mcp = _Server("heliofleet", instructions=INSTRUCTIONS)
 fleet = Fleet()
 
+# Parameter types shared by several tools
+Time = Annotated[str, Field(description="UTC time: ISO 8601 (2026-11-19T12:00Z), a date (2026-11-19), "
+                                        "'now', or a Julian date. Data cover 2010 to about 2030.")]
+Wind = Annotated[float, Field(description="Solar-wind speed in km/s for the Parker-spiral footpoint "
+                                          "longitude (typical 300-800).", ge=100, le=3000)]
+BODY_HELP = ("Body key or name: earth, sdo, soho, aditya, ace, wind, dscovr, imap, swfo, cgo, solo, psp, "
+             "bepi, sta, stb, maven, messenger, vex, juno, rosetta, juice, clipper, psyche, mercury, venus, "
+             "mars; names such as 'Parker' or 'Solar Orbiter' also work.")
 
-@mcp.tool()
-def get_position(body: str, time: str = "now", solar_wind_km_s: float = 400.0) -> dict[str, Any]:
-    """Where one body is at a UTC time: distance from the Sun (au), Stonyhurst lon/lat, Carrington
-    longitude as seen from Earth, heliocentric ecliptic J2000 and HEE vectors (au), angle from Earth,
-    distance to Earth, light time and Parker-spiral footpoint longitude, with a HelioFleet link."""
+
+@tool(mcp, "Position of one body")
+def get_position(body: Annotated[str, Field(description=BODY_HELP)], time: Time = "now",
+                 solar_wind_km_s: Wind = 400.0) -> dict[str, Any]:
+    """Get where one spacecraft or planet is at a UTC time: distance from the Sun, Stonyhurst and
+    Carrington coordinates, ecliptic and HEE vectors, angle and distance from Earth, light time and
+    Parker-spiral footpoint, with a HelioFleet map link.
+
+    Use for questions about a single body's location. For every body at once use get_fleet_state;
+    for what that body sees of the Sun (B0, L0, apparent radius) use get_viewing_geometry; for its
+    PFSS magnetic connection to the Sun use get_magnetic_connection. An unknown body name returns an
+    error listing the valid keys; a time outside the body's ephemeris returns a status (prelaunch,
+    ended, nodata) instead of coordinates."""
     return fleet.position(body, time, solar_wind_km_s)
 
 
-@mcp.tool()
-def get_fleet_state(time: str = "now", include_planets: bool = True,
-                    solar_wind_km_s: float = 400.0) -> dict[str, Any]:
-    """Positions of Earth, every spacecraft on the HelioFleet map and (optionally) Mercury, Venus and
-    Mars at a UTC time, in the same columns as get_position, with a link to the map at that moment."""
+@tool(mcp, "Positions of the whole fleet")
+def get_fleet_state(time: Time = "now",
+                    include_planets: Annotated[bool, Field(description="Also return Mercury, Venus and Mars.")] = True,
+                    solar_wind_km_s: Wind = 400.0) -> dict[str, Any]:
+    """Get the positions of Earth, every spacecraft on the HelioFleet map and, optionally, the inner
+    planets at one UTC time, in the same columns as get_position, with a map link.
+
+    Use to compare many bodies at one moment (who is where, who is near Earth). Bodies without data
+    at that time are listed under not_shown with the reason. For one body use get_position."""
     return fleet.fleet_state(time, include_planets, solar_wind_km_s)
 
 
-@mcp.tool()
-def find_alignments(kind: Literal["radial", "quadrature", "conjunction", "connection"] = "radial",
-                    a: str = "psp", b: str | None = None, tolerance_deg: float | None = None,
-                    start: str = "now", end: str | None = None, max_windows: int | None = None,
-                    solar_wind_km_s: float = 400.0) -> dict[str, Any]:
-    """Time windows when a geometric condition holds, sampled hourly when Parker is involved and
-    every 6 hours otherwise (the HelioFleet alignment tool's method).
+@tool(mcp, "Find alignments, quadratures, conjunctions and connections")
+def find_alignments(
+        kind: Annotated[Literal["radial", "quadrature", "conjunction", "connection"], Field(
+            description="radial: a and b within tolerance of the same Sun-centred direction; quadrature: a "
+                        "90 deg from Earth seen from the Sun; conjunction: a behind the Sun seen from Earth; "
+                        "connection: Parker-spiral footpoints of a and b close in longitude.")] = "radial",
+        a: Annotated[str, Field(description="First body (key or name). " + BODY_HELP)] = "psp",
+        b: Annotated[str | None, Field(description="Second body for radial and connection; default Earth. "
+                                                   "Ignored for quadrature and conjunction.")] = None,
+        tolerance_deg: Annotated[float | None, Field(
+            description="Window threshold in degrees; defaults: radial 5, quadrature 5, conjunction 2, "
+                        "connection 10.", gt=0, le=90)] = None,
+        start: Time = "now",
+        end: Annotated[str | None, Field(description="End of the search (UTC); default one year after start.")] = None,
+        max_windows: Annotated[int | None, Field(description="Stop after this many windows; 1 answers "
+                                                             "'when is the next ...'.", ge=1)] = None,
+        solar_wind_km_s: Wind = 400.0) -> dict[str, Any]:
+    """Find the time windows when a geometric configuration holds between two bodies, searching
+    hourly when Parker is involved and every 6 hours otherwise (HelioFleet's alignment method).
 
-    kind: radial (Sun-centred angle between a and b <= tolerance, default 5 deg),
-    quadrature (a is 90 deg from Earth seen from the Sun, within tolerance, default 5),
-    conjunction (a behind the Sun seen from Earth, within tolerance of Sun centre, default 2),
-    connection (Parker-spiral footpoints of a and b within tolerance in longitude, default 10).
-    end defaults to one year after start; max_windows=1 answers "when is the next ...".
-    Each window gives start, end, best time and value, positions at best, and a link that reruns
-    the search on the page."""
+    Use for any custom search: a pair, a tolerance or a date range of your choice, including the
+    past. For the precomputed calendar of notable upcoming events use list_upcoming_events. Each
+    window gives start, end, best time and value, positions at the best time, and a link that
+    reruns the search on the page."""
     return fleet.find_alignments(kind, a, b, tolerance_deg, start, end, solar_wind_km_s, max_windows)
 
 
-@mcp.tool()
-def list_upcoming_events(start: str = "now", end: str | None = None, kind: str | None = None,
-                         body: str | None = None, include_space_weather: bool = False) -> dict[str, Any]:
-    """HelioFleet's event calendar between two UTC times (default: the next year): perihelia,
+@tool(mcp, "Upcoming events calendar")
+def list_upcoming_events(
+        start: Time = "now",
+        end: Annotated[str | None, Field(description="End of the range (UTC); default one year after start.")] = None,
+        kind: Annotated[str | None, Field(description="Comma list to keep: perihelion, alignment, quadrature, "
+                                                      "conjunction, eclipse.")] = None,
+        body: Annotated[str | None, Field(description="Keep only events involving this body (key or name).")] = None,
+        include_space_weather: Annotated[bool, Field(description="Add NASA DONKI flares (M1+), CMEs (500 km/s+) "
+                                                                 "and geomagnetic storms (G1+) in the range.")] = False,
+) -> dict[str, Any]:
+    """List HelioFleet's precomputed event calendar between two UTC times: perihelia, radial
     alignments, quadratures, solar conjunctions and total solar eclipses, each with a link.
-    kind filters by a comma list (perihelion, alignment, quadrature, conjunction, eclipse); body
-    keeps events involving that body. include_space_weather adds NASA DONKI flares (M1+), CMEs
-    (500 km/s+) and geomagnetic storms (G1+) in the range."""
+
+    Use for "what is coming up" questions. The calendar covers the future only and uses fixed
+    thresholds; for past dates, other pairs or other tolerances use find_alignments."""
     return fleet.upcoming_events(start, end, kind, body, include_space_weather)
 
 
-@mcp.tool()
-def viewing_geometry(observer: str = "all", time: str = "now") -> dict[str, Any]:
-    """What an observer (Earth or a spacecraft, or 'all') sees of the Sun at a UTC time: light time
-    and offset from Earth, apparent solar radius (RSUN_OBS), B0 (HGLT_OBS), Stonyhurst longitude
-    (HGLN_OBS), L0 with its own light time (CRLN_OBS), km per arcsec and scale relative to Earth.
-    Includes the map's viewing-geometry link and, where available, a sky-view link from that observer."""
+@tool(mcp, "Viewing geometry of an observer")
+def get_viewing_geometry(
+        observer: Annotated[str, Field(description="Earth, a spacecraft key or name, or 'all' for every "
+                                                   "observer with data.")] = "all",
+        time: Time = "now") -> dict[str, Any]:
+    """Get what an observer sees of the Sun at a UTC time: light time and offset from Earth,
+    apparent solar radius (RSUN_OBS), B0 (HGLT_OBS), Stonyhurst longitude (HGLN_OBS), L0 with its
+    own light time (CRLN_OBS), km per arcsec and scale relative to Earth.
+
+    Use to co-align or time-align images from different observers (the values match the FITS
+    keywords). For where the observer is use get_position. Includes the map's viewing-geometry link
+    and, for observers the sky view supports, a sky-view link."""
     return fleet.viewing_geometry(observer, time)
 
 
-@mcp.tool()
-def heliofleet_link(time: str = "now", page: Literal["map", "sky"] = "map", tab: str | None = None,
-                    observer: str = "earth", frame: Literal["hee", "hae"] | None = None,
-                    view: Literal["top", "side"] | None = None, zoom: float | None = None,
-                    hide: list[str] | None = None, spirals: bool | None = None,
-                    solar_wind_km_s: float | None = None,
-                    spot_system: Literal["carrington", "stonyhurst"] | None = None,
-                    spot_lon: float | None = None, spot_lat: float | None = None,
-                    align_kind: Literal["radial", "quadrature", "connection"] | None = None,
-                    align_a: str | None = None, align_b: str | None = None, align_tolerance_deg: float | None = None,
-                    align_from: str | None = None, align_to: str | None = None) -> dict[str, Any]:
-    """Build a HelioFleet URL that reproduces a view. page=map: frame (hee Earth-fixed, hae inertial),
-    view, zoom (au), hide (body keys), spirals, wind, a marked surface spot, a tab (coords, geom,
-    align, vis, series, anim) and an alignment search to rerun. page=sky: the plane of the sky seen
-    from observer (earth, solo, psp, bepi, sta, stb, maven), zoom in solar radii."""
+@tool(mcp, "Build a HelioFleet link")
+def build_heliofleet_link(
+        time: Time = "now",
+        page: Annotated[Literal["map", "sky"], Field(description="map: positions around the Sun; sky: the "
+                                                                 "plane of the sky seen from an observer.")] = "map",
+        tab: Annotated[str | None, Field(
+            description="Map tool tab to open: coords, geom, align, vis, series, anim.")] = None,
+        observer: Annotated[str, Field(
+            description="Sky-view observer: earth, solo, psp, bepi, sta, stb, maven.")] = "earth",
+        frame: Annotated[Literal["hee", "hae"] | None, Field(
+            description="Map frame: hee Earth-fixed, hae inertial.")] = None,
+        view: Annotated[Literal["top", "side"] | None, Field(
+            description="Map view: top (from ecliptic north) or side.")] = None,
+        zoom: Annotated[float | None, Field(description="Map half-width in au, or sky-view half-width in solar radii.",
+                                            gt=0)] = None,
+        hide: Annotated[list[str] | None, Field(description="Body keys to hide.")] = None,
+        spirals: Annotated[bool | None, Field(description="Draw Parker spirals on the map.")] = None,
+        solar_wind_km_s: Annotated[float | None, Field(
+            description="Wind speed for spirals and footpoints (km/s).")] = None,
+        spot_system: Annotated[Literal["carrington", "stonyhurst"] | None, Field(
+            description="Coordinate system of a surface spot to mark.")] = None,
+        spot_lon: Annotated[float | None, Field(description="Spot longitude (deg).")] = None,
+        spot_lat: Annotated[float | None, Field(description="Spot latitude (deg).", ge=-90, le=90)] = None,
+        align_kind: Annotated[Literal["radial", "quadrature", "connection"] | None, Field(
+            description="Alignment search to rerun on the page.")] = None,
+        align_a: Annotated[str | None, Field(description="First body of that search.")] = None,
+        align_b: Annotated[str | None, Field(description="Second body of that search.")] = None,
+        align_tolerance_deg: Annotated[float | None, Field(description="Tolerance of that search (deg).")] = None,
+        align_from: Annotated[str | None, Field(description="Start of that search (UTC date).")] = None,
+        align_to: Annotated[str | None, Field(description="End of that search (UTC date).")] = None,
+) -> dict[str, Any]:
+    """Build a HelioFleet URL that opens a chosen view of the spacecraft map or the sky view, with
+    no computation.
+
+    Use when the user wants a link to share or open, with settings the other tools do not set
+    (frame, zoom, hidden bodies, a marked spot, a tab, an alignment search). Every data tool
+    already returns a link to its own view. For HelioField pages (3D corona, connectivity, space
+    weather) use build_heliofield_link."""
     return fleet.link(time, page, tab=tab, observer=observer, frame=frame, view=view, zoom=zoom, hide=hide,
                       spirals=spirals, solar_wind_km_s=solar_wind_km_s, spot_system=spot_system,
                       spot_lon=spot_lon, spot_lat=spot_lat, align_kind=align_kind, align_a=align_a,
@@ -105,10 +177,13 @@ def heliofleet_link(time: str = "now", page: Literal["map", "sky"] = "map", tab:
                       align_to=align_to)
 
 
-@mcp.tool()
-def data_status() -> dict[str, Any]:
-    """Which HelioFleet data release is loaded (build time, next monthly update, where it came from)
-    and each body's ephemeris span."""
+@tool(mcp, "Loaded data release")
+def get_data_status() -> dict[str, Any]:
+    """Get which HelioFleet data release is loaded (build time, next monthly update, source) and
+    each body's ephemeris span.
+
+    Use to check how far the data reach before asking about distant dates, or to report the data
+    version with results. Takes no parameters."""
     return fleet.data_status()
 
 

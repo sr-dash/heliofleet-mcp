@@ -76,28 +76,28 @@ def _parser() -> argparse.ArgumentParser:
     c.add_argument("--body")
     c.add_argument("--space-weather", action="store_true", help="add DONKI flares, CMEs and storms")
 
-    c = add("geometry", help="what an observer sees of the Sun (viewing_geometry)")
+    c = add("geometry", help="what an observer sees of the Sun (get_viewing_geometry)")
     c.add_argument("observer", nargs="?", default="all")
     c.add_argument("--time", default="now")
 
-    c = add("link", help="a HelioFleet map or sky-view link (heliofleet_link)")
+    c = add("link", help="a HelioFleet map or sky-view link (build_heliofleet_link)")
     c.add_argument("--time", default="now")
     c.add_argument("--page", choices=["map", "sky"], default="map")
     c.add_argument("--observer", default="earth", help="sky view observer")
     c.add_argument("--tab", choices=["coords", "geom", "align", "vis", "series", "anim"])
 
-    add("status", help="which data release is loaded (data_status)")
+    add("status", help="which data release is loaded (get_data_status)")
 
-    c = add("connection", help="magnetic connection to the Sun, HelioField (magnetic_connection)")
+    c = add("connection", help="magnetic connection to the Sun, HelioField (get_magnetic_connection)")
     c.add_argument("body", nargs="?", default="all")
     c.add_argument("--date", default="latest")
     c.add_argument("--wind", type=float, default=400.0)
     c.add_argument("--self-consistent", action="store_true", help="use each body's own WSA speed")
 
-    c = add("spaceweather", help="HelioField space-weather indicators (space_weather)")
+    c = add("spaceweather", help="HelioField space-weather indicators (get_space_weather)")
     c.add_argument("--date", default="latest")
 
-    c = add("field", help="coronal field summary, HelioField (coronal_field)")
+    c = add("field", help="coronal field summary, HelioField (get_coronal_field)")
     c.add_argument("--date", default="latest")
     return p
 

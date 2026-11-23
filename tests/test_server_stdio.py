@@ -14,8 +14,8 @@ from mcp.client.stdio import StdioServerParameters, stdio_client  # noqa: E402
 from heliofleet_mcp.data import _default_local  # noqa: E402
 
 EXPECTED = {"get_position", "get_fleet_state", "find_alignments", "list_upcoming_events",
-            "viewing_geometry", "heliofleet_link", "data_status",
-            "magnetic_connection", "space_weather", "coronal_field", "heliofield_link"}
+            "get_viewing_geometry", "build_heliofleet_link", "get_data_status",
+            "get_magnetic_connection", "get_space_weather", "get_coronal_field", "build_heliofield_link"}
 
 
 def _payload(result):
@@ -39,7 +39,7 @@ async def _session_run():
                 "kind": "radial", "a": "psp", "b": "solo", "tolerance_deg": 10,
                 "start": "2026-11-19", "max_windows": 1})
             pos = await session.call_tool("get_position", {"body": "Solar Orbiter", "time": "2026-11-19T00:00Z"})
-            link = await session.call_tool("heliofleet_link", {"time": "2026-11-19T00:00Z", "page": "sky",
+            link = await session.call_tool("build_heliofleet_link", {"time": "2026-11-19T00:00Z", "page": "sky",
                                                                "observer": "solo"})
             return tools, _payload(demo), _payload(pos), _payload(link)
 

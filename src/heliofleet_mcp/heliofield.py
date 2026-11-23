@@ -20,9 +20,12 @@ import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any, Literal
 from urllib.parse import urlencode
 
+from pydantic import Field
+
+from ._tools import tool
 from .catalog import resolve
 from .data import DataError
 from .links import map_link
@@ -284,7 +287,7 @@ class HelioField:
     # ---------- tools ----------
 
     def magnetic_connection(self, body="all", date="latest", solar_wind_km_s=400.0, self_consistent=False):
-        """Where a body connects magnetically to the Sun (the ``magnetic_connection`` tool).
+        """Where a body connects magnetically to the Sun (the ``get_magnetic_connection`` tool).
 
         Follows the Parker spiral from the body to the source surface, then the PFSS field line
         down to the photosphere.
@@ -379,7 +382,7 @@ class HelioField:
         }
 
     def space_weather(self, date="latest"):
-        """HelioField's space-weather indicators for a day (the ``space_weather`` tool).
+        """HelioField's space-weather indicators for a day (the ``get_space_weather`` tool).
 
         Parameters
         ----------
@@ -424,7 +427,7 @@ class HelioField:
         }
 
     def coronal_field(self, date="latest"):
-        """Summary of the coronal magnetic field for a day (the ``coronal_field`` tool).
+        """Summary of the coronal magnetic field for a day (the ``get_coronal_field`` tool).
 
         Parameters
         ----------
@@ -487,10 +490,16 @@ def _grid_speed(v: float) -> int:
     return int(min(800, max(300, int(v / 100 + 0.5) * 100)))
 
 
+# The date parameter of the HelioField tools (module level: annotations are resolved here)
+Day = Annotated[str, Field(description="UTC date (2026-11-19, or a full ISO time) or 'latest' for the "
+                                       "newest daily product.")]
+
+
 def register(server, store: FieldStore | None = None) -> HelioField:
     """Add the HelioField tools to an MCP server.
 
-    Registers ``magnetic_connection``, ``space_weather``, ``coronal_field`` and ``heliofield_link``.
+    Registers ``get_magnetic_connection``, ``get_space_weather``, ``get_coronal_field`` and
+    ``build_heliofield_link``.
     Their docstrings are the tool descriptions MCP clients show.
 
     Parameters
@@ -513,43 +522,75 @@ def register(server, store: FieldStore | None = None) -> HelioField:
     """
     hf = HelioField(store)
 
-    @server.tool()
-    def magnetic_connection(body: str = "all", date: str = "latest", solar_wind_km_s: float = 400.0,
-                            self_consistent: bool = False) -> dict[str, Any]:
-        """Where a spacecraft or Earth connects magnetically to the Sun, from HelioField's daily PFSS
-        product: Parker spiral to the source surface, then the PFSS field line down to its photospheric
-        footpoint (Carrington lon/lat), with expansion factor, distance to the coronal-hole boundary and
-        a WSA-type speed. Bodies: earth, psp, solo, bepi, sta, aditya, ace, wind, imap, swfo, or 'all'.
-        Daily products cover roughly the last two months; other dates return links to the page, which
-        computes any date since 2010-05-01. self_consistent=True picks, per body, the wind speed that
-        matches its own WSA estimate."""
+    @tool(server, "Magnetic connection to the Sun")
+    def get_magnetic_connection(
+            body: Annotated[str, Field(description="earth, psp, solo, bepi, sta, aditya, ace, wind, imap, swfo, "
+                                                   "or 'all'; names such as 'Parker' also work.")] = "all",
+            date: Day = "latest",
+            solar_wind_km_s: Annotated[float, Field(
+                description="Wind speed for the Parker spiral (km/s); ignored when self_consistent is true.",
+                ge=100, le=3000)] = 400.0,
+            self_consistent: Annotated[bool, Field(description="Pick, per body, the wind speed that matches its "
+                                                               "own WSA estimate.")] = False,
+    ) -> dict[str, Any]:
+        """Get where a spacecraft or Earth connects magnetically to the Sun, from HelioField's daily
+        PFSS product: Parker spiral to the source surface, then the field line down to its
+        photospheric footpoint (Carrington lon/lat), with expansion factor, distance to the
+        coronal-hole boundary and a WSA-type speed.
+
+        Use for source-region and solar-energetic-particle connectivity questions. The plain
+        Parker-spiral footpoint, without the coronal field, is in get_position. Daily products
+        cover roughly the last two months; other dates return links to the page, which computes
+        any date since 2010-05-01. Model output, not an observation."""
         return hf.magnetic_connection(body, date, solar_wind_km_s, self_consistent)
 
-    @server.tool()
-    def space_weather(date: str = "latest") -> dict[str, Any]:
-        """HelioField's space-weather indicators for a day: model wind speed and magnetic sector at
-        Earth, next sector boundary, 7-day peak, a -1..+7 day outlook, IMF estimate, Russell-McPherron
-        factor, Earth-facing coronal holes, an alert level, and the solar wind measured at L1 that day.
-        Not an official forecast."""
+    @tool(server, "Space-weather indicators")
+    def get_space_weather(date: Day = "latest") -> dict[str, Any]:
+        """Get HelioField's space-weather indicators for a day: model wind speed and magnetic sector
+        at Earth, next sector boundary, 7-day peak, a -1..+7 day outlook, IMF estimate,
+        Russell-McPherron factor, Earth-facing coronal holes, an alert level, and the solar wind
+        measured at L1 that day.
+
+        Use for conditions at Earth on a recent day. Dates older than the daily series return
+        found=false. Flares, CMEs and storms from NASA DONKI are in list_upcoming_events with
+        include_space_weather. Model indicators, not an official forecast (that is NOAA SWPC)."""
         return hf.space_weather(date)
 
-    @server.tool()
-    def coronal_field(date: str = "latest") -> dict[str, Any]:
-        """Summary of the coronal magnetic field for a day: magnetogram, PFSS settings, open flux,
-        Earth's L0/B0, and the solar-cycle context for the Carrington rotation (open flux and area,
-        current-sheet tilt, polar fields; available for any date since 2010), with HelioField links
-        to the 3D corona, the current sheet to 1 au, coronal holes and observations."""
+    @tool(server, "Coronal field summary")
+    def get_coronal_field(date: Day = "latest") -> dict[str, Any]:
+        """Get a summary of the coronal magnetic field for a day: magnetogram, PFSS settings, open
+        flux, Earth's L0/B0, and the solar-cycle context of the Carrington rotation (open flux and
+        area, current-sheet tilt, polar fields), with HelioField links to the 3D corona, the
+        current sheet to 1 au, coronal holes and observations.
+
+        Use for the state of the corona or the solar cycle on a date; the rotation context exists
+        for any date since 2010. For one body's connection use get_magnetic_connection."""
         return hf.coronal_field(date)
 
-    @server.tool()
-    def heliofield_link(date: str = "latest", page: str = "model", view: str | None = None,
-                        layers: list[str] | None = None, solar_wind_km_s: int | None = None,
-                        rss: float | None = None, scs: float | None = None, focus: str | None = None,
-                        embed: bool = False, theme: str | None = None) -> dict[str, Any]:
-        """Build a HelioField URL. page: model (3D corona), connect, spaceweather or observations.
-        view: earth, north, fleet. layers: photo, foot, closed, open, ext, ss, pil, hcs, fleet,
-        spiral, cloud. rss 1.5-3.5 and scs 5|10|21.5 apply to computed dates. focus (connect page):
-        psp, solo, bepi, sta, stb, earth. embed=1 computes past dates without a dialog."""
+    @tool(server, "Build a HelioField link")
+    def build_heliofield_link(
+            date: Day = "latest",
+            page: Annotated[Literal["model", "connect", "spaceweather", "observations"], Field(
+                description="model: 3D corona; connect: magnetic connectivity; spaceweather; observations.")] = "model",
+            view: Annotated[Literal["earth", "north", "fleet"] | None, Field(
+                description="Camera of the 3D view.")] = None,
+            layers: Annotated[list[str] | None, Field(description="Layers to show: photo, foot, closed, open, ext, "
+                                                                  "ss, pil, hcs, fleet, spiral, cloud.")] = None,
+            solar_wind_km_s: Annotated[int | None, Field(description="Wind speed for spirals (km/s).")] = None,
+            rss: Annotated[float | None, Field(description="Source-surface radius (1.5-3.5 solar radii); "
+                                                           "computed dates only.", ge=1.5, le=3.5)] = None,
+            scs: Annotated[float | None, Field(description="Current-sheet model outer radius: 5, 10 or 21.5 "
+                                                           "solar radii; computed dates only.")] = None,
+            focus: Annotated[str | None, Field(description="Connect page: body to focus (psp, solo, bepi, sta, "
+                                                           "stb, earth).")] = None,
+            embed: Annotated[bool, Field(description="Compute past dates without the confirmation dialog.")] = False,
+            theme: Annotated[str | None, Field(description="Page colour theme.")] = None,
+    ) -> dict[str, Any]:
+        """Build a HelioField URL for a date and page, with no computation.
+
+        Use when the user wants a link to the 3D corona, the connectivity page, space weather or
+        observations with specific settings. The HelioField data tools already return links to
+        their views. For HelioFleet's spacecraft map or sky view use build_heliofleet_link."""
         return {"link": field_link(_date(date), page, view=view, layers=layers, v=solar_wind_km_s, rss=rss,
                                    scs=scs, focus=focus, embed=embed, theme=theme)}
 

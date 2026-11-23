@@ -19,10 +19,10 @@ Install and run with one command: `uvx heliofleet-mcp` (MCP server), or `uvx hel
 - `position BODY --time T` (get_position): distance, Stonyhurst and Carrington coordinates, ecliptic and HEE vectors, angle from Earth, light time, Parker-spiral footpoint.
 - `fleet --time T` (get_fleet_state): the same for every spacecraft and planet.
 - `events [--kind K] [--body B] [--space-weather]` (list_upcoming_events): perihelia, alignments, quadratures, conjunctions, eclipses; optionally DONKI flares, CMEs and storms.
-- `geometry OBSERVER --time T` (viewing_geometry): light time, RSUN_OBS, B0, HGLN_OBS, CRLN_OBS, km per arcsec.
-- `link --time T [--page sky --observer B]` (heliofleet_link)
-- `connection BODY [--wind V]` (magnetic_connection): HelioField PFSS footpoint, expansion factor, coronal-hole distance, WSA-type speed.
-- `spaceweather [--date D]` (space_weather), `field [--date D]` (coronal_field), `status` (data_status).
+- `geometry OBSERVER --time T` (get_viewing_geometry): light time, RSUN_OBS, B0, HGLN_OBS, CRLN_OBS, km per arcsec.
+- `link --time T [--page sky --observer B]` (build_heliofleet_link)
+- `connection BODY [--wind V]` (get_magnetic_connection): HelioField PFSS footpoint, expansion factor, coronal-hole distance, WSA-type speed.
+- `spaceweather [--date D]` (get_space_weather), `field [--date D]` (get_coronal_field), `status` (get_data_status).
 
 Bodies: earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury venus mars. Names such as "Parker" also work. Times are UTC: ISO 8601, a date, `now`, or a Julian date.
 

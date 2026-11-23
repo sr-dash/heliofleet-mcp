@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.4.0 (2026-11-23)
+
+**Breaking: seven MCP tools are renamed** to one verb_noun pattern. Clients that call tools by
+name must update; the Python API and the command line are unchanged.
+
+| Old name | New name |
+|---|---|
+| `data_status` | `get_data_status` |
+| `viewing_geometry` | `get_viewing_geometry` |
+| `magnetic_connection` | `get_magnetic_connection` |
+| `space_weather` | `get_space_weather` |
+| `coronal_field` | `get_coronal_field` |
+| `heliofleet_link` | `build_heliofleet_link` |
+| `heliofield_link` | `build_heliofield_link` |
+
+- Every tool parameter now has a description in the input schema (types, units, defaults, valid
+  values and ranges), and numeric parameters carry their valid range.
+- Every tool has a title and read-only annotations (read-only, non-destructive, idempotent,
+  open-world: all tools only read published data).
+- Tool descriptions lead with what the tool does, then say when to use it and which sibling
+  to use instead (for example get_position versus get_viewing_geometry, or find_alignments
+  versus list_upcoming_events). The server instructions add a short tool guide.
+- The README demo is rebuilt from HelioFleet 1.2.0 (the new spacecraft are on the map).
+
 ## 0.3.0 (2026-11-23)
 
 Matches HelioFleet 1.2.0.

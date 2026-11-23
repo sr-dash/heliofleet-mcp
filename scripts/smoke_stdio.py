@@ -10,8 +10,8 @@ from mcp import ClientSession
 from mcp.client.stdio import StdioServerParameters, stdio_client
 
 EXPECTED = {"get_position", "get_fleet_state", "find_alignments", "list_upcoming_events",
-            "viewing_geometry", "heliofleet_link", "data_status",
-            "magnetic_connection", "space_weather", "coronal_field", "heliofield_link"}
+            "get_viewing_geometry", "build_heliofleet_link", "get_data_status",
+            "get_magnetic_connection", "get_space_weather", "get_coronal_field", "build_heliofield_link"}
 
 
 async def run(cmd: str) -> None:
@@ -22,7 +22,7 @@ async def run(cmd: str) -> None:
             missing = EXPECTED - names
             if missing:
                 raise SystemExit(f"missing tools: {sorted(missing)}")
-            res = await s.call_tool("heliofleet_link", {"time": "2026-11-19T00:00Z"})
+            res = await s.call_tool("build_heliofleet_link", {"time": "2026-11-19T00:00Z"})
             if getattr(res, "is_error", False) or getattr(res, "isError", False):
                 raise SystemExit(f"tool call failed: {res}")
             print(f"ok: {len(names)} tools")

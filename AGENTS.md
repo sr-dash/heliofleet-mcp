@@ -54,12 +54,12 @@ To install these instructions as a reusable skill, use
 | Where is everything? | `fleet --time T` | `get_fleet_state` |
 | When are two bodies aligned, or one in quadrature or conjunction? | `align A [B] --kind K --tol DEG --after T [--before T] [--next]` | `find_alignments` |
 | What is coming up (perihelia, alignments, eclipses)? | `events [--kind ...] [--body B]` | `list_upcoming_events` |
-| What does an observer see of the Sun (B0, L0, solar radius, light time)? | `geometry OBSERVER --time T` | `viewing_geometry` |
-| A link to show the user | `link --time T [--page sky --observer B]` | `heliofleet_link` |
-| Where does a spacecraft connect to the Sun? | `connection BODY [--wind V]` | `magnetic_connection` |
-| Solar-wind and sector outlook at Earth | `spaceweather [--date D]` | `space_weather` |
-| Coronal field, open flux, solar-cycle context | `field [--date D]` | `coronal_field` |
-| Which data release is loaded | `status` | `data_status` |
+| What does an observer see of the Sun (B0, L0, solar radius, light time)? | `geometry OBSERVER --time T` | `get_viewing_geometry` |
+| A link to show the user | `link --time T [--page sky --observer B]` | `build_heliofleet_link` |
+| Where does a spacecraft connect to the Sun? | `connection BODY [--wind V]` | `get_magnetic_connection` |
+| Solar-wind and sector outlook at Earth | `spaceweather [--date D]` | `get_space_weather` |
+| Coronal field, open flux, solar-cycle context | `field [--date D]` | `get_coronal_field` |
+| Which data release is loaded | `status` | `get_data_status` |
 
 Alignment kinds:
 - `radial`: the Sun-centred angle between A and B is within the tolerance (default 5°).

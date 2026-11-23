@@ -33,12 +33,12 @@ uvx heliofleet-mcp spaceweather                                        # (7)!
 | `fleet` | `get_fleet_state` | `--time`, `--no-planets`, `--wind` |
 | `align A [B]` | `find_alignments` | `--kind`, `--tol`, `--after`, `--before`, `--next`, `--max`, `--wind` |
 | `events` | `list_upcoming_events` | `--after`, `--before`, `--kind`, `--body`, `--space-weather` |
-| `geometry [OBSERVER]` | `viewing_geometry` | `--time` |
-| `link` | `heliofleet_link` | `--time`, `--page map\|sky`, `--observer`, `--tab` |
-| `status` | `data_status` | |
-| `connection [BODY]` | `magnetic_connection` | `--date`, `--wind`, `--self-consistent` |
-| `spaceweather` | `space_weather` | `--date` |
-| `field` | `coronal_field` | `--date` |
+| `geometry [OBSERVER]` | `get_viewing_geometry` | `--time` |
+| `link` | `build_heliofleet_link` | `--time`, `--page map\|sky`, `--observer`, `--tab` |
+| `status` | `get_data_status` | |
+| `connection [BODY]` | `get_magnetic_connection` | `--date`, `--wind`, `--self-consistent` |
+| `spaceweather` | `get_space_weather` | `--date` |
+| `field` | `get_coronal_field` | `--date` |
 | `serve` | (the MCP server) | |
 
 `--compact` prints one-line JSON, before or after the command. `uvx heliofleet-mcp --help` and

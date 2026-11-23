@@ -323,7 +323,7 @@ class Fleet:
     # ---------- viewing geometry (js/tools.js geometryRows) ----------
 
     def viewing_geometry(self, observer="all", time=None):
-        """What an observer sees of the Sun (the ``viewing_geometry`` tool; js/tools.js geometryRows).
+        """What an observer sees of the Sun (the ``get_viewing_geometry`` tool; js/tools.js geometryRows).
 
         Parameters
         ----------
@@ -640,7 +640,7 @@ class Fleet:
              hide=None, spirals=None, solar_wind_km_s=None, spot_system=None, spot_lon=None, spot_lat=None,
              align_kind=None, align_a=None, align_b=None, align_tolerance_deg=None, align_from=None,
              align_to=None):
-        """A HelioFleet map or sky-view URL that reproduces a view (the ``heliofleet_link`` tool).
+        """A HelioFleet map or sky-view URL that reproduces a view (the ``build_heliofleet_link`` tool).
 
         Parameters
         ----------
@@ -703,7 +703,7 @@ class Fleet:
         return {"link": url}
 
     def data_status(self):
-        """The loaded data release and each body's ephemeris span (the ``data_status`` tool).
+        """The loaded data release and each body's ephemeris span (the ``get_data_status`` tool).
 
         Returns
         -------

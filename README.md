@@ -34,9 +34,9 @@ available as an MCP server, as one-shot commands that print JSON, and as a Pytho
 | `get_fleet_state(time)` | The same columns for Earth, every spacecraft on the map, and optionally Mercury, Venus and Mars |
 | `find_alignments(kind, a, b, tolerance_deg, start, end)` | Windows of `radial` alignment, `quadrature` with Earth, solar `conjunction` (behind the Sun seen from Earth) or magnetic `connection` (Parker-spiral footpoints). Each window has start, end, best time and value, plus a link that reruns the search on the page |
 | `list_upcoming_events(start, end)` | HelioFleet's calendar: perihelia, alignments, quadratures, conjunctions and eclipses. Optionally adds DONKI flares, CMEs and storms |
-| `viewing_geometry(observer, time)` | Light time and offset from Earth, RSUN_OBS, B0, HGLN_OBS, L0 (CRLN_OBS, the observer's own light time), km per arcsec and scale relative to Earth, with a sky-view link |
-| `heliofleet_link(...)` | A map or sky-view URL for a time, frame, zoom, hidden bodies, surface spot, tab or alignment search |
-| `data_status()` | Which data release is loaded, where it came from, and each body's span |
+| `get_viewing_geometry(observer, time)` | Light time and offset from Earth, RSUN_OBS, B0, HGLN_OBS, L0 (CRLN_OBS, the observer's own light time), km per arcsec and scale relative to Earth, with a sky-view link |
+| `build_heliofleet_link(...)` | A map or sky-view URL for a time, frame, zoom, hidden bodies, surface spot, tab or alignment search |
+| `get_data_status()` | Which data release is loaded, where it came from, and each body's span |
 
 ### HelioField plugin (on by default)
 
@@ -45,10 +45,10 @@ daily PFSS products. They read published files and do not solve the field.
 
 | Tool | What it returns |
 | --- | --- |
-| `magnetic_connection(body, date, solar_wind_km_s)` | Where Earth, the L1 fleet, Parker, Solar Orbiter, BepiColombo or STEREO-A connects to the Sun: the Parker-spiral point on the source surface, the PFSS footpoint (Carrington), the expansion factor, distance to the coronal-hole boundary and a WSA-type speed. `self_consistent=True` uses each body's own speed estimate |
-| `space_weather(date)` | Model wind speed and sector at Earth, the next sector boundary, a −1 to +7 day outlook, an alert level, and that day's solar wind measured at L1 |
-| `coronal_field(date)` | Magnetogram, PFSS settings, open flux and Earth's L0/B0, plus solar-cycle context per Carrington rotation (open flux and area, current-sheet tilt, polar fields; any date since 2010) |
-| `heliofield_link(...)` | A link to the 3D corona, connectivity, space-weather or observations page |
+| `get_magnetic_connection(body, date, solar_wind_km_s)` | Where Earth, the L1 fleet, Parker, Solar Orbiter, BepiColombo or STEREO-A connects to the Sun: the Parker-spiral point on the source surface, the PFSS footpoint (Carrington), the expansion factor, distance to the coronal-hole boundary and a WSA-type speed. `self_consistent=True` uses each body's own speed estimate |
+| `get_space_weather(date)` | Model wind speed and sector at Earth, the next sector boundary, a −1 to +7 day outlook, an alert level, and that day's solar wind measured at L1 |
+| `get_coronal_field(date)` | Magnetogram, PFSS settings, open flux and Earth's L0/B0, plus solar-cycle context per Carrington rotation (open flux and area, current-sheet tilt, polar fields; any date since 2010) |
+| `build_heliofield_link(...)` | A link to the 3D corona, connectivity, space-weather or observations page |
 
 Daily products cover about the last two months. For older dates the tools return links, because the
 HelioField page computes any date since 2010-05-01 in the browser. HelioField's Carrington positions
