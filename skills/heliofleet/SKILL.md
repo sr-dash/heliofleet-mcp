@@ -61,6 +61,7 @@ heliofleet-mcp <command> [options] --compact
 | Which IRIS, EIS, DKIST, Solar Orbiter or rocket datasets cover a time or a spot? | `observations --after T1 --before T2 --instruments iris,dkist --at X Y --radius 60` |
 | When did different facilities observe the same target? | `coordinated --after T1 --before T2 --facilities dkist,iris` |
 | A link to show the user | `link --time T` or `link --time T --page sky --observer solo` |
+| Which body keys, names, aliases and instruments exist? | `bodies` |
 | Which data release is loaded? | `status` |
 
 Options: `--after`/`--before` (aliases `--start`/`--end`) bound a search; the default range is one

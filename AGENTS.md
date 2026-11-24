@@ -64,6 +64,7 @@ To install these instructions as a reusable skill, use
 | Where does a spacecraft connect to the Sun? | `connection BODY [--wind V]` | `get_magnetic_connection` |
 | Solar-wind and sector outlook at Earth | `spaceweather [--date D]` | `get_space_weather` |
 | Coronal field, open flux, solar-cycle context | `field [--date D]` | `get_coronal_field` |
+| Which body keys, names and instruments exist? | `bodies` | `list_bodies` |
 | Which data release is loaded | `status` | `get_data_status` |
 
 Alignment kinds:

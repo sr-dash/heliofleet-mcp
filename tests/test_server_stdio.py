@@ -15,7 +15,7 @@ from heliofleet_mcp.data import _default_local  # noqa: E402
 
 EXPECTED = {"get_position", "get_fleet_state", "find_alignments", "list_upcoming_events",
             "get_viewing_geometry", "build_heliofleet_link", "get_data_status",
-            "get_trajectory", "search_observations", "find_coordinated_observations",
+            "get_trajectory", "search_observations", "find_coordinated_observations", "list_bodies",
             "get_magnetic_connection", "get_space_weather", "get_coronal_field", "build_heliofield_link"}
 
 

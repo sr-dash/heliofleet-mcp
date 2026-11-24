@@ -26,11 +26,12 @@ ace, wind, dscovr, imap, swfo, cgo, solo, psp, bepi, sta, stb, maven, messenger,
 rosetta, juice, clipper, psyche, mercury, venus, mars
 (common names such as 'Parker' or 'Solar Orbiter' also work). Every result carries a HelioFleet
 link that reproduces the view in the browser; give it to the user with the numbers.
-Which tool: one body -> get_position; one body over a date range -> get_trajectory; every body ->
-get_fleet_state; what an observer sees of the Sun -> get_viewing_geometry; when a configuration
-happens -> find_alignments (any search) or list_upcoming_events (the precomputed calendar); which
-IRIS, Hinode/EIS, DKIST, Solar Orbiter or rocket datasets exist -> search_observations, and joint
-ones -> find_coordinated_observations; a link only -> build_heliofleet_link.
+Which tool: which keys, names and instruments exist -> list_bodies; one body -> get_position;
+one body over a date range -> get_trajectory; every body -> get_fleet_state; what an observer
+sees of the Sun -> get_viewing_geometry; when a configuration happens -> find_alignments (any
+search) or list_upcoming_events (the precomputed calendar); which IRIS, Hinode/EIS, DKIST,
+Solar Orbiter or rocket datasets exist -> search_observations, and joint ones ->
+find_coordinated_observations; a link only -> build_heliofleet_link.
 With the HelioField plugin (on by default), get_magnetic_connection, get_space_weather,
 get_coronal_field and build_heliofield_link add the PFSS coronal field and magnetic connectivity
 from HelioField's daily products. All tools are read-only."""
@@ -103,9 +104,9 @@ def search_observations(
         end: Annotated[str | None, Field(description="End of the range (UTC); default one day after start. "
                                                      "At most a year.")] = None,
         instruments: Annotated[str | None, Field(
-            description="Comma list of instruments (iris, eis, vbi, visp, dlnirsp, vtf, cryonirsp, euihri, "
-                        "euilya, phihrt, spice, hic, clasp) or facilities (dkist, iris, eis, solo, rocket). "
-                        "Default: all.")] = None,
+            description="Comma list of instruments (iris, eis, vbi, visp, dlnirsp, euihri, euilya, phihrt, "
+                        "spice, hic, clasp; list_bodies gives their coverage) or facilities (dkist, iris, "
+                        "eis, solo, rocket). Default: all.")] = None,
         x_arcsec: Annotated[float | None, Field(description="Point on the Sun as seen from Earth: helioprojective "
                                                             "x (arcsec, west positive). Give with y_arcsec.")] = None,
         y_arcsec: Annotated[float | None, Field(description="Helioprojective y (arcsec, north positive).")] = None,
@@ -253,6 +254,23 @@ def build_heliofleet_link(
                       spot_lon=spot_lon, spot_lat=spot_lat, align_kind=align_kind, align_a=align_a,
                       align_b=align_b, align_tolerance_deg=align_tolerance_deg, align_from=align_from,
                       align_to=align_to)
+
+
+@tool(mcp, "Bodies and instruments available")
+def list_bodies(
+        include_instruments: Annotated[bool, Field(
+            description="Also list the observation instruments of search_observations with the months "
+                        "they cover.")] = True,
+) -> dict[str, Any]:
+    """List every body the tools accept (Earth, the spacecraft and the inner planets) with its key,
+    full and short names, accepted aliases, kind, launch, loss-of-contact and end dates, ephemeris
+    span and whether it can be a sky-view observer; and, optionally, the observation instruments
+    with their facility, first and last month and number of records.
+
+    Use first when unsure which key or name to pass, whether a body has data at a date, or which
+    instruments search_observations covers. For the data release and per-series spans use
+    get_data_status; for positions use get_position or get_trajectory."""
+    return fleet.list_bodies(include_instruments)
 
 
 @tool(mcp, "Loaded data release")

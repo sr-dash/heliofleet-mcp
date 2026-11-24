@@ -38,6 +38,7 @@ uvx heliofleet-mcp spaceweather                                        # (7)!
 | `observations` | `search_observations` | `--after`, `--before`, `--instruments`, `--at X Y`, `--radius`, `--max`, `--no-images` |
 | `coordinated` | `find_coordinated_observations` | `--after`, `--before`, `--facilities`, `--max` |
 | `link` | `build_heliofleet_link` | `--time`, `--page map\|sky`, `--observer`, `--tab` |
+| `bodies` | `list_bodies` | `--no-instruments` |
 | `status` | `get_data_status` | |
 | `connection [BODY]` | `get_magnetic_connection` | `--date`, `--wind`, `--self-consistent` |
 | `spaceweather` | `get_space_weather` | `--date` |

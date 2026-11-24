@@ -113,6 +113,9 @@ def _parser() -> argparse.ArgumentParser:
 
     add("status", help="which data release is loaded (get_data_status)")
 
+    c = add("bodies", help="body keys, names, aliases, dates and observation instruments (list_bodies)")
+    c.add_argument("--no-instruments", action="store_true", help="bodies only")
+
     c = add("connection", help="magnetic connection to the Sun, HelioField (get_magnetic_connection)")
     c.add_argument("body", nargs="?", default="all")
     c.add_argument("--date", default="latest")
@@ -185,6 +188,8 @@ def run(args: argparse.Namespace):
         return f.viewing_geometry(args.observer, args.time)
     if args.cmd == "link":
         return f.link(args.time, args.page, tab=args.tab, observer=args.observer)
+    if args.cmd == "bodies":
+        return f.list_bodies(not args.no_instruments)
     if args.cmd == "status":
         return f.data_status()
     raise ValueError(f"unknown command {args.cmd}")

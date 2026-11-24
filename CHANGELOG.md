@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.2 (2026-11-24)
+
+- New tool `list_bodies`: every body the tools accept, with its key, full and short names, accepted
+  aliases, kind, launch, loss-of-contact and end dates, ephemeris span and whether it can be a
+  sky-view observer; and the observation instruments of `search_observations` with their facility,
+  first and last month and number of records. Command line: `bodies`. Python: `Fleet.list_bodies`.
+- `search_observations` lists only the instruments that have records (DKIST Cryo-NIRSP and VTF are
+  not in HelioFleet's observation files).
+
 ## 0.4.1 (2026-11-23)
 
 Three new tools; nothing is renamed or removed.

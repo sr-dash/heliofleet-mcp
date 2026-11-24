@@ -25,7 +25,7 @@ Install and run with one command: `uvx heliofleet-mcp` (MCP server), or `uvx hel
 - `coordinated --after T [--facilities dkist,iris]` (find_coordinated_observations): overlapping observations by different facilities.
 - `link --time T [--page sky --observer B]` (build_heliofleet_link)
 - `connection BODY [--wind V]` (get_magnetic_connection): HelioField PFSS footpoint, expansion factor, coronal-hole distance, WSA-type speed.
-- `spaceweather [--date D]` (get_space_weather), `field [--date D]` (get_coronal_field), `status` (get_data_status).
+- `spaceweather [--date D]` (get_space_weather), `field [--date D]` (get_coronal_field), `status` (get_data_status), `bodies` (list_bodies: keys, names, aliases, dates and observation instruments).
 
 Bodies: earth sdo soho aditya ace wind dscovr imap swfo cgo solo psp bepi sta stb maven messenger vex juno rosetta juice clipper psyche mercury venus mars. Names such as "Parker" also work. Times are UTC: ISO 8601, a date, `now`, or a Julian date.
 

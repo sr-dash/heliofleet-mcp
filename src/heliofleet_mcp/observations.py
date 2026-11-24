@@ -233,9 +233,9 @@ class Observations:
         start, end : str or float, optional
             UTC range. Default: the day starting at ``start`` (now if not given). At most a year.
         instruments : str or list of str, optional
-            Instrument keys (``iris``, ``eis``, ``vbi``, ``visp``, ``dlnirsp``, ``vtf``,
-            ``cryonirsp``, ``euihri``, ``euilya``, ``phihrt``, ``spice``, ``hic``, ``clasp``) or
-            facilities (``dkist``, ``iris``, ``eis``, ``solo``, ``rocket``). Default: all.
+            Instrument keys (``iris``, ``eis``, ``vbi``, ``visp``, ``dlnirsp``, ``euihri``, ``euilya``,
+            ``phihrt``, ``spice``, ``hic``, ``clasp``) or facilities (``dkist``, ``iris``, ``eis``,
+            ``solo``, ``rocket``). Default: all.
         x_arcsec, y_arcsec : float, optional
             A point in Earth's helioprojective view (arcsec); keep fields that contain it.
         radius_arcsec : float, optional

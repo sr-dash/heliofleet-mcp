@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import math
 
-from .catalog import BODIES, PLANETS, SKY_OBSERVERS, SPACECRAFT, resolve
+from .catalog import ALIASES, BODIES, PLANETS, SKY_OBSERVERS, SPACECRAFT, resolve
 from .data import Store
 from .frames import (ARCSEC, AU_KM, C_KM_S, R_SUN_KM, angle_between, footpoint_lon, heliographic, norm,
                      sub, to_hee, wrap180)
@@ -807,6 +807,68 @@ class Fleet:
                 "bodies": {k: {"start_utc": iso(v["start"]), "end_utc": iso(v["end"]), "step_days": v["step"],
                                "units": v["units"], "center": v["center"]} for k, v in m["bodies"].items()},
                 "link": "https://sr-dash.github.io/heliofleet/methods.html"}
+
+    def list_bodies(self, include_instruments=True):
+        """The bodies and observation instruments the tools accept (the ``list_bodies`` tool).
+
+        Parameters
+        ----------
+        include_instruments : bool, optional
+            Also list the instruments of ``search_observations`` with their coverage (default).
+
+        Returns
+        -------
+        dict
+            ``bodies`` (``key``, ``name``, ``short_name``, ``kind``, ``aliases``, ``near_earth``,
+            ``sky_view_observer``, ``launch_utc``, ``contact_lost_utc``, ``ended_utc``,
+            ``ephemeris_start_utc``, ``ephemeris_end_utc``, ``step_days``), ``timeline_utc``,
+            ``data`` and, if asked, ``observation_instruments`` (``key``, ``name``, ``facility``,
+            ``first_month``, ``last_month``, ``records``) with ``facilities``.
+
+        Examples
+        --------
+        >>> b = {x["key"]: x for x in Fleet().list_bodies(False)["bodies"]}
+        >>> b["psp"]["name"], "parker" in b["psp"]["aliases"]
+        ('Parker Solar Probe', True)
+        """
+        m = self.store.manifest()
+        aliases: dict[str, list[str]] = {}
+        for alias, key in ALIASES.items():
+            aliases.setdefault(key, []).append(alias)
+        bodies = []
+        for key, b in BODIES.items():
+            series = b.get("geo") if b.get("derived") else key
+            info = m["bodies"].get(series) or {}
+            bodies.append({
+                "key": key, "name": b["name"], "short_name": b.get("short"),
+                "kind": "spacecraft" if b["kind"] == "sc" else "planet",
+                "aliases": sorted(aliases.get(key, [])),
+                "near_earth": bool(b.get("near")), "sky_view_observer": key in SKY_OBSERVERS,
+                "launch_utc": b.get("launch"), "contact_lost_utc": b.get("lost"), "ended_utc": b.get("ended"),
+                "ephemeris_start_utc": iso(info["start"]) if info else None,
+                "ephemeris_end_utc": iso(info["end"]) if info else None,
+                "step_days": info.get("step"),
+            })
+        out = {"bodies": bodies,
+               "timeline_utc": [iso(m["timeline"]["start"]), iso(m["timeline"]["end"])],
+               "note": "Any key, name, short name or alias is accepted wherever a tool takes a body. Near-Earth "
+                       "spacecraft (L1, Earth orbit) share Earth's viewpoint on the map.",
+               "data": self.data_info()}
+        if include_instruments:
+            from .observations import FACILITIES, INSTRUMENTS
+            idx = self.store.json("data/obs/index.json") or {"months": {}}
+            cover: dict[str, list] = {}
+            for month in sorted(idx["months"]):
+                for inst, n in idx["months"][month].items():
+                    c = cover.setdefault(inst, [month, month, 0])
+                    c[1], c[2] = month, c[2] + n
+            out["observation_instruments"] = [
+                {"key": k, "name": name, "facility": fac,
+                 "first_month": cover.get(k, [None])[0], "last_month": cover.get(k, [None, None])[1],
+                 "records": cover.get(k, [None, None, 0])[2]}
+                for k, (name, fac) in INSTRUMENTS.items() if cover.get(k)]
+            out["facilities"] = FACILITIES
+        return out
 
     # ---------- misc ----------
 

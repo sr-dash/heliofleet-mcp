@@ -72,3 +72,20 @@ def test_coordinated(obs):
     g = obs.coordinated("2012-01-01", "2020-01-01", "rocket")
     assert g["total"] == 4
     assert all("rocket" in x["facilities"] for x in g["groups"])
+
+
+def test_list_bodies(fleet):
+    d = fleet.list_bodies()
+    keys = [b["key"] for b in d["bodies"]]
+    from heliofleet_mcp.catalog import BODIES, resolve
+    assert keys == list(BODIES)
+    for b in d["bodies"]:
+        assert b["ephemeris_start_utc"] and b["ephemeris_end_utc"]
+        for a in b["aliases"]:
+            assert resolve(a) == b["key"]
+    stb = next(b for b in d["bodies"] if b["key"] == "stb")
+    assert stb["ended_utc"].startswith("2018-10-17") and stb["sky_view_observer"]
+    inst = {i["key"]: i for i in d["observation_instruments"]}
+    assert inst["iris"]["first_month"] == "2013-07" and inst["hic"]["facility"] == "rocket"
+    assert all(i["records"] > 0 for i in inst.values())
+    assert "observation_instruments" not in fleet.list_bodies(False)

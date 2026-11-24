@@ -39,6 +39,7 @@ available as an MCP server, as one-shot commands that print JSON, and as a Pytho
 | `search_observations(start, end, instruments, x_arcsec, y_arcsec)` | IRIS, Hinode/EIS, DKIST, Solar Orbiter (EUI-HRI, PHI-HRT, SPICE), Hi-C and CLASP observations in a time range, optionally covering a point on the disk: dataset id, times, programme, field of view in Earth's helioprojective frame (centre, size, polygon), archive link, and SDO AIA 171, AIA 193 and HMI PNG cutouts around the field |
 | `find_coordinated_observations(start, end, facilities)` | Groups of observations by different facilities that overlap in time and on the Sun: start, duration, shared point, facilities and counts, with a sky-view link |
 | `build_heliofleet_link(...)` | A map or sky-view URL for a time, frame, zoom, hidden bodies, surface spot, tab or alignment search |
+| `list_bodies()` | Every body the tools accept: key, names, aliases, kind, launch, loss-of-contact and end dates, ephemeris span, sky-view observer; and the observation instruments with their facility, months covered and record count |
 | `get_data_status()` | Which data release is loaded, where it came from, and each body's span |
 
 ### HelioField plugin (on by default)

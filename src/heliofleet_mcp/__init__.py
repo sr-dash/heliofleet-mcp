@@ -31,7 +31,7 @@ Examples
 1.837
 """
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 # These modules use only the standard library; the MCP SDK is imported by server.py alone.
 from .data import Store  # noqa: E402
