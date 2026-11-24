@@ -298,7 +298,7 @@ The `tests` workflow validates the package and `server.json` on every push.
 
 MIT. To cite this package: Dash, S. (2026). *heliofleet-mcp: spacecraft geometry and solar magnetic
 connectivity from HelioFleet and HelioField data* [Computer software]. Zenodo. <https://doi.org/10.5281/zenodo.24409982>.
-That DOI resolves to the latest release; [10.5281/zenodo.24486125](https://doi.org/10.5281/zenodo.24486125) is version 0.4.1, [10.5281/zenodo.24483693](https://doi.org/10.5281/zenodo.24483693) is version 0.4.0, [10.5281/zenodo.24481640](https://doi.org/10.5281/zenodo.24481640) is version 0.3.0, [10.5281/zenodo.24411341](https://doi.org/10.5281/zenodo.24411341) is version 0.2.0,
+That DOI resolves to the latest release; [10.5281/zenodo.24486668](https://doi.org/10.5281/zenodo.24486668) is version 0.4.2, [10.5281/zenodo.24486125](https://doi.org/10.5281/zenodo.24486125) is version 0.4.1, [10.5281/zenodo.24483693](https://doi.org/10.5281/zenodo.24483693) is version 0.4.0, [10.5281/zenodo.24481640](https://doi.org/10.5281/zenodo.24481640) is version 0.3.0, [10.5281/zenodo.24411341](https://doi.org/10.5281/zenodo.24411341) is version 0.2.0,
 [10.5281/zenodo.24411004](https://doi.org/10.5281/zenodo.24411004) is version 0.1.2
 and [10.5281/zenodo.24409983](https://doi.org/10.5281/zenodo.24409983) is version 0.1.1.
 [`CITATION.cff`](https://github.com/sr-dash/heliofleet-mcp/blob/main/CITATION.cff) drives GitHub's
