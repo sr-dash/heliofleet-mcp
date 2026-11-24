@@ -20,6 +20,15 @@ All distances are au unless the name says otherwise; angles are degrees; times a
 
 `fleet` also lists `not_shown` (bodies without a position, with the reason).
 
+## trajectory
+
+`columns` names the entries of each `rows[]` list: `time_utc`, `status`, `r_au`, `hgs_lon_deg`,
+`hgs_lat_deg`, `carrington_lon_deg`, `hee_x_au`, `hee_y_au`, `hee_z_au`, `sep_from_earth_deg`,
+`dist_to_earth_au`, `light_time_s` and (not for planets) `footpoint_hgs_lon_deg`, as in `position`.
+Rows outside the ephemeris keep `time_utc` and `status` with null coordinates. `extremes` gives the
+closest and farthest points from the Sun and the closest approach to Earth among the samples; report
+them at the sampling step. `link` opens the map with the orbit trail over the range.
+
 ## geometry (`observers[]`)
 
 | Field | FITS keyword | Meaning |
@@ -47,6 +56,24 @@ All distances are au unless the name says otherwise; angles are degrees; times a
 | `link` | HelioFleet page that reruns the search at the best time |
 
 Top level: `query`, `definition`, `step_hours` (1 with Parker, else 6), `samples`, `resolution_note`.
+
+## observations (`observations[]`)
+
+| Field | Meaning |
+| --- | --- |
+| `instrument`, `instrument_name`, `facility` | e.g. `iris`, `IRIS`, `iris`; facilities: dkist, iris, eis, solo, rocket |
+| `id`, `description` | dataset or study identifier and programme description from the archive |
+| `start_utc`, `end_utc` | time range (catalogue durations over a day are cut to a day) |
+| `field_earth_view` | helioprojective arcsec seen from Earth: centre, width, height, closed polygon, `far_side` |
+| `recorded_field` | Solar Orbiter only: the field as recorded from Solar Orbiter, with its position |
+| `slit_jaw_field_earth_view` | IRIS only: the slit-jaw field |
+| `data_link` | archive page of the dataset, where the source gives one |
+| `sdo_images_png` | Helioviewer PNG cutouts (AIA 171, AIA 193, HMI) around the field at mid-time |
+| `sky_view_link` | HelioFleet sky view at mid-time |
+
+Top level: `total` (all matches) and `returned` (at most `--max`). `coordinated` returns `groups[]`
+with `start_utc`, `hours`, the shared point `x_arcsec`, `y_arcsec`, `r_over_rsun`, `facilities`,
+`observations` (count per instrument), `first_id` and `sky_view_link`.
 
 ## events (`events[]`)
 

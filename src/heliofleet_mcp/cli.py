@@ -21,6 +21,9 @@ EPILOG = """examples:
   heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next
   heliofleet-mcp align sta --kind quadrature --after 2027-01-01 --before 2028-01-01
   heliofleet-mcp position parker --time 2025-03-22T22:25Z
+  heliofleet-mcp trajectory psp --after 2025-03-20 --before 2025-03-25 --step 6
+  heliofleet-mcp observations --after 2024-03-01 --instruments iris,dkist --at -380 10 --radius 60
+  heliofleet-mcp coordinated --after 2024-01-01 --facilities dkist,iris
   heliofleet-mcp geometry solo --time now
   heliofleet-mcp events --kind perihelion,alignment
   heliofleet-mcp connection psp --wind 450
@@ -52,6 +55,28 @@ def _parser() -> argparse.ArgumentParser:
     c.add_argument("body")
     c.add_argument("--time", default="now")
     c.add_argument("--wind", type=float, default=400.0, help="solar wind for the footpoint, km/s")
+
+    c = add("trajectory", help="one body's coordinates over a date range (get_trajectory)")
+    c.add_argument("body")
+    c.add_argument("--after", "--start", dest="start", default="now")
+    c.add_argument("--before", "--end", dest="end", help="default: 30 days after the start")
+    c.add_argument("--step", type=float, default=24.0, help="sampling step in hours (default 24)")
+    c.add_argument("--wind", type=float, default=400.0)
+
+    c = add("observations", help="IRIS, EIS, DKIST, Solar Orbiter and rocket datasets (search_observations)")
+    c.add_argument("--after", "--start", dest="start", default="now")
+    c.add_argument("--before", "--end", dest="end", help="default: one day after the start")
+    c.add_argument("--instruments", help="comma list of instruments or facilities (dkist, iris, eis, solo, rocket)")
+    c.add_argument("--at", nargs=2, type=float, metavar=("X", "Y"), help="point seen from Earth, arcsec")
+    c.add_argument("--radius", type=float, default=0.0, help="arcsec around --at")
+    c.add_argument("--max", type=int, default=50, dest="max_results")
+    c.add_argument("--no-images", action="store_true", help="leave out the SDO image cutout URLs")
+
+    c = add("coordinated", help="overlapping observations by different facilities (find_coordinated_observations)")
+    c.add_argument("--after", "--start", dest="start", default="now")
+    c.add_argument("--before", "--end", dest="end", help="default: one year after the start")
+    c.add_argument("--facilities", help="comma list: dkist, iris, eis, solo, rocket")
+    c.add_argument("--max", type=int, default=50, dest="max_results")
 
     c = add("fleet", help="every spacecraft and planet at a time (get_fleet_state)")
     c.add_argument("--time", default="now")
@@ -134,8 +159,19 @@ def run(args: argparse.Namespace):
             return hf.space_weather(args.date)
         return hf.coronal_field(args.date)
 
+    if args.cmd in ("observations", "coordinated"):
+        from .observations import Observations
+        o = Observations()
+        if args.cmd == "coordinated":
+            return o.coordinated(args.start, args.end, args.facilities, args.max_results)
+        x, y = args.at if args.at else (None, None)
+        return o.search(args.start, args.end, args.instruments, x, y, args.radius, args.max_results,
+                        not args.no_images)
+
     from .geometry import Fleet
     f = Fleet()
+    if args.cmd == "trajectory":
+        return f.trajectory(args.body, args.start, args.end, args.step, args.wind)
     if args.cmd == "position":
         return f.position(args.body, args.time, args.wind)
     if args.cmd == "fleet":

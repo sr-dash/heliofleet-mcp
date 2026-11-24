@@ -1,7 +1,7 @@
 {
   "name": "heliofleet",
   "description": "Heliophysics spacecraft geometry: positions, alignments, conjunctions, viewing geometry (B0, L0) and PFSS magnetic connectivity for Parker Solar Probe, Solar Orbiter, STEREO and more, from JPL Horizons.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": {
     "name": "Soumyaranjan Dash"
   },

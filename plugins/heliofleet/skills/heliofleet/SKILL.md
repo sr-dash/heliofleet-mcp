@@ -2,14 +2,15 @@
 name: heliofleet
 description: >-
   Answer questions about heliophysics spacecraft geometry from JPL Horizons ephemerides: where Parker
-  Solar Probe, Solar Orbiter, STEREO-A, BepiColombo, SDO, SOHO, ACE, Wind, DSCOVR, Aditya-L1, IMAP and
-  the planets are; when two of them line up (radial alignment, quadrature with Earth, solar
-  conjunction, Parker-spiral magnetic connection); what each sees of the Sun (B0, L0/CRLN_OBS,
-  apparent solar radius, light time); upcoming perihelia and events; and where each connects
-  magnetically to the Sun (PFSS footpoints, expansion factor, space-weather outlook). Use when the user
-  asks about spacecraft positions, alignments, conjunctions, quadratures, perihelia, viewing geometry,
-  Carrington or Stonyhurst coordinates, or solar magnetic connectivity. Runs the heliofleet-mcp
-  command line, which prints JSON with a HelioFleet or HelioField link for every answer.
+  Solar Probe, Solar Orbiter, STEREO-A, BepiColombo, SDO, SOHO, ACE, Wind, Aditya-L1 and the planets
+  are, at one time or over a date range; when two line up (radial alignment, quadrature, solar
+  conjunction, Parker-spiral connection); what each sees of the Sun (B0, L0, solar radius, light
+  time); upcoming perihelia; where each connects magnetically to the Sun (PFSS footpoints,
+  space-weather outlook); and which IRIS, Hinode/EIS, DKIST, Solar Orbiter or sounding-rocket
+  observations cover a time or a spot on the Sun. Use for spacecraft positions, trajectories,
+  alignments, conjunctions, perihelia, viewing geometry, Carrington or Stonyhurst coordinates,
+  magnetic connectivity or coordinated observations. Runs the heliofleet-mcp command line, which
+  prints JSON with a HelioFleet or HelioField link for every answer.
 license: MIT
 compatibility: >-
   Needs the heliofleet-mcp command (a Python 3.10+ package; install guide at
@@ -49,6 +50,7 @@ heliofleet-mcp <command> [options] --compact
 | When is A behind the Sun seen from Earth (solar conjunction)? | `align A --kind conjunction --after T` |
 | When are A and B magnetically connected (Parker-spiral footpoints)? | `align A B --kind connection --wind 400 --after T` |
 | Where is A at a time? | `position A --time T` |
+| How does A's position change over a period (orbit, perihelion pass)? | `trajectory A --after T1 --before T2 --step 6` |
 | Where is everything? | `fleet --time T` |
 | What does an observer see of the Sun (B0, L0, solar radius, light time)? | `geometry OBSERVER --time T` |
 | What is coming up (perihelia, alignments, eclipses)? | `events --kind perihelion,alignment --body A` |
@@ -56,6 +58,8 @@ heliofleet-mcp <command> [options] --compact
 | Where does A connect to the Sun today (PFSS footpoint)? | `connection A --wind 450` |
 | Solar-wind and sector outlook at Earth? | `spaceweather` |
 | Coronal field, open flux, solar-cycle context? | `field --date D` |
+| Which IRIS, EIS, DKIST, Solar Orbiter or rocket datasets cover a time or a spot? | `observations --after T1 --before T2 --instruments iris,dkist --at X Y --radius 60` |
+| When did different facilities observe the same target? | `coordinated --after T1 --before T2 --facilities dkist,iris` |
 | A link to show the user | `link --time T` or `link --time T --page sky --observer solo` |
 | Which data release is loaded? | `status` |
 

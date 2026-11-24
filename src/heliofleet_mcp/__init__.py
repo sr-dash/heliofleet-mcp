@@ -10,6 +10,9 @@ Main classes
 Fleet
     Positions, viewing geometry, alignment search and the event calendar
     ([`heliofleet_mcp.geometry`][heliofleet_mcp.geometry]).
+Observations
+    Observation footprints of IRIS, Hinode/EIS, DKIST, Solar Orbiter and sounding rockets
+    ([`heliofleet_mcp.observations`][heliofleet_mcp.observations]).
 HelioField
     PFSS magnetic connectivity, space-weather indicators and the coronal-field summary
     ([`heliofleet_mcp.heliofield`][heliofleet_mcp.heliofield]).
@@ -28,11 +31,12 @@ Examples
 1.837
 """
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 # These modules use only the standard library; the MCP SDK is imported by server.py alone.
 from .data import Store  # noqa: E402
 from .geometry import Fleet  # noqa: E402
 from .heliofield import FieldStore, HelioField  # noqa: E402
+from .observations import Observations  # noqa: E402
 
-__all__ = ["Fleet", "HelioField", "Store", "FieldStore", "__version__"]
+__all__ = ["Fleet", "Observations", "HelioField", "Store", "FieldStore", "__version__"]

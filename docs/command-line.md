@@ -30,10 +30,13 @@ uvx heliofleet-mcp spaceweather                                        # (7)!
 | Command | MCP tool | Main options |
 | --- | --- | --- |
 | `position BODY` | `get_position` | `--time`, `--wind` |
+| `trajectory BODY` | `get_trajectory` | `--after`, `--before`, `--step` (hours), `--wind` |
 | `fleet` | `get_fleet_state` | `--time`, `--no-planets`, `--wind` |
 | `align A [B]` | `find_alignments` | `--kind`, `--tol`, `--after`, `--before`, `--next`, `--max`, `--wind` |
 | `events` | `list_upcoming_events` | `--after`, `--before`, `--kind`, `--body`, `--space-weather` |
 | `geometry [OBSERVER]` | `get_viewing_geometry` | `--time` |
+| `observations` | `search_observations` | `--after`, `--before`, `--instruments`, `--at X Y`, `--radius`, `--max`, `--no-images` |
+| `coordinated` | `find_coordinated_observations` | `--after`, `--before`, `--facilities`, `--max` |
 | `link` | `build_heliofleet_link` | `--time`, `--page map\|sky`, `--observer`, `--tab` |
 | `status` | `get_data_status` | |
 | `connection [BODY]` | `get_magnetic_connection` | `--date`, `--wind`, `--self-consistent` |

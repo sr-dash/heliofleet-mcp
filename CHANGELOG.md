@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.1 (2026-11-23)
+
+Three new tools; nothing is renamed or removed.
+
+- `get_trajectory`: one body's coordinates sampled over a date range (up to 2000 samples, step in
+  hours) as a table with the `get_position` columns, plus the closest and farthest points from the
+  Sun and the closest approach to Earth. Command line: `trajectory BODY --after T --before T --step H`.
+- `search_observations`: IRIS, Hinode/EIS, DKIST, Solar Orbiter (EUI-HRI, PHI-HRT, SPICE), Hi-C and
+  CLASP observations from HelioFleet's footprint files, by time range, instrument or facility, and
+  optionally a point on the disk. Each record has the dataset id, times, programme, field of view
+  in Earth's helioprojective frame (Solar Orbiter fields carried over as on the sky view), the
+  archive link and SDO AIA 171, AIA 193 and HMI PNG cutouts around the field. Command line:
+  `observations`.
+- `find_coordinated_observations`: groups of observations by different facilities that overlap in
+  time and on the Sun, from HelioFleet's coordinated list. Command line: `coordinated`.
+- Python: `heliofleet_mcp.Observations` and `Fleet.trajectory`.
+
 ## 0.4.0 (2026-11-23)
 
 **Breaking: seven MCP tools are renamed** to one verb_noun pattern. Clients that call tools by

@@ -14,6 +14,7 @@ except ImportError:  # mcp 1.x
 
 from ._tools import tool
 from .geometry import Fleet
+from .observations import Observations
 
 INSTRUCTIONS = """\
 Positions and viewing geometry of heliophysics spacecraft (SDO, SOHO, Aditya-L1, ACE, Wind,
@@ -25,15 +26,18 @@ ace, wind, dscovr, imap, swfo, cgo, solo, psp, bepi, sta, stb, maven, messenger,
 rosetta, juice, clipper, psyche, mercury, venus, mars
 (common names such as 'Parker' or 'Solar Orbiter' also work). Every result carries a HelioFleet
 link that reproduces the view in the browser; give it to the user with the numbers.
-Which tool: one body -> get_position; every body -> get_fleet_state; what an observer sees of the
-Sun -> get_viewing_geometry; when a configuration happens -> find_alignments (any search) or
-list_upcoming_events (the precomputed calendar); a link only -> build_heliofleet_link.
+Which tool: one body -> get_position; one body over a date range -> get_trajectory; every body ->
+get_fleet_state; what an observer sees of the Sun -> get_viewing_geometry; when a configuration
+happens -> find_alignments (any search) or list_upcoming_events (the precomputed calendar); which
+IRIS, Hinode/EIS, DKIST, Solar Orbiter or rocket datasets exist -> search_observations, and joint
+ones -> find_coordinated_observations; a link only -> build_heliofleet_link.
 With the HelioField plugin (on by default), get_magnetic_connection, get_space_weather,
 get_coronal_field and build_heliofield_link add the PFSS coronal field and magnetic connectivity
 from HelioField's daily products. All tools are read-only."""
 
 mcp = _Server("heliofleet", instructions=INSTRUCTIONS)
 fleet = Fleet()
+observations = Observations(fleet.store)
 
 # Parameter types shared by several tools
 Time = Annotated[str, Field(description="UTC time: ISO 8601 (2026-11-19T12:00Z), a date (2026-11-19), "
@@ -52,7 +56,8 @@ def get_position(body: Annotated[str, Field(description=BODY_HELP)], time: Time 
     Carrington coordinates, ecliptic and HEE vectors, angle and distance from Earth, light time and
     Parker-spiral footpoint, with a HelioFleet map link.
 
-    Use for questions about a single body's location. For every body at once use get_fleet_state;
+    Use for questions about a single body's location at one time. For a date range use
+    get_trajectory; for every body at once use get_fleet_state;
     for what that body sees of the Sun (B0, L0, apparent radius) use get_viewing_geometry; for its
     PFSS magnetic connection to the Sun use get_magnetic_connection. An unknown body name returns an
     error listing the valid keys; a time outside the body's ephemeris returns a status (prelaunch,
@@ -70,6 +75,79 @@ def get_fleet_state(time: Time = "now",
     Use to compare many bodies at one moment (who is where, who is near Earth). Bodies without data
     at that time are listed under not_shown with the reason. For one body use get_position."""
     return fleet.fleet_state(time, include_planets, solar_wind_km_s)
+
+
+@tool(mcp, "Trajectory of one body over a date range")
+def get_trajectory(
+        body: Annotated[str, Field(description=BODY_HELP)],
+        start: Time = "now",
+        end: Annotated[str | None, Field(description="End of the range (UTC); default 30 days after start.")] = None,
+        step_hours: Annotated[float, Field(description="Sampling step in hours (default 24). At most 2000 samples "
+                                                       "per call; use 1-6 h for Parker near perihelion.",
+                                           gt=0, le=8784)] = 24.0,
+        solar_wind_km_s: Wind = 400.0) -> dict[str, Any]:
+    """Get one spacecraft's or planet's coordinates sampled over a time range, as a table: distance
+    from the Sun, Stonyhurst and Carrington coordinates, HEE vector, angle and distance from Earth,
+    light time and Parker-spiral footpoint at each step, with the closest and farthest points.
+
+    Use for time series, orbit plots, perihelion passes and "how does X change over this period"
+    questions. For one moment use get_position; for every body at one moment use get_fleet_state;
+    for the times a configuration holds use find_alignments. Samples outside the body's ephemeris
+    keep their time and status with null coordinates."""
+    return fleet.trajectory(body, start, end, step_hours, solar_wind_km_s)
+
+
+@tool(mcp, "Search observation footprints")
+def search_observations(
+        start: Time = "now",
+        end: Annotated[str | None, Field(description="End of the range (UTC); default one day after start. "
+                                                     "At most a year.")] = None,
+        instruments: Annotated[str | None, Field(
+            description="Comma list of instruments (iris, eis, vbi, visp, dlnirsp, vtf, cryonirsp, euihri, "
+                        "euilya, phihrt, spice, hic, clasp) or facilities (dkist, iris, eis, solo, rocket). "
+                        "Default: all.")] = None,
+        x_arcsec: Annotated[float | None, Field(description="Point on the Sun as seen from Earth: helioprojective "
+                                                            "x (arcsec, west positive). Give with y_arcsec.")] = None,
+        y_arcsec: Annotated[float | None, Field(description="Helioprojective y (arcsec, north positive).")] = None,
+        radius_arcsec: Annotated[float, Field(description="Also keep fields within this distance of the point.",
+                                              ge=0, le=3000)] = 0.0,
+        max_results: Annotated[int, Field(description="Most observations returned, earliest first; 'total' "
+                                                      "counts every match.", ge=1, le=500)] = 50,
+        include_images: Annotated[bool, Field(description="Add PNG cutouts of SDO AIA 171, AIA 193 and HMI "
+                                                          "around each field (Helioviewer).")] = True,
+) -> dict[str, Any]:
+    """Search the observation records of high-resolution solar instruments (IRIS, Hinode/EIS, DKIST,
+    Solar Orbiter EUI-HRI, PHI-HRT and SPICE, Hi-C and CLASP rockets) that overlap a time range,
+    optionally covering a point on the Sun. Each record gives the instrument, dataset id, start and
+    end, programme description, field of view in Earth's helioprojective frame (centre, size,
+    polygon), the archive data link, SDO image cutout URLs and a sky-view link.
+
+    Use to find which datasets exist for an event, a region or a time, and where each instrument
+    pointed. For groups of overlapping observations by different facilities use
+    find_coordinated_observations; for full-disk or remote fields of spacecraft use
+    get_viewing_geometry. Records come from the public archives' catalogues, refreshed monthly."""
+    return observations.search(start, end, instruments, x_arcsec, y_arcsec, radius_arcsec, max_results,
+                               include_images)
+
+
+@tool(mcp, "Find coordinated observations")
+def find_coordinated_observations(
+        start: Time = "now",
+        end: Annotated[str | None, Field(description="End of the range (UTC); default one year after start.")] = None,
+        facilities: Annotated[str | None, Field(
+            description="Comma list; keep groups that include all of them: dkist, iris, eis, solo, rocket. "
+                        "Default: any group.")] = None,
+        max_results: Annotated[int, Field(description="Most groups returned, earliest first.", ge=1, le=500)] = 50,
+) -> dict[str, Any]:
+    """Find groups of observations by different facilities (DKIST, IRIS, Hinode/EIS, Solar Orbiter,
+    sounding rockets) that overlap in time and on the Sun as seen from Earth, from HelioFleet's
+    precomputed list. Each group gives the start, duration, shared point on the disk, facilities,
+    the number of observations per instrument and a sky-view link.
+
+    Use to find joint datasets for a study, e.g. "when did DKIST and IRIS observe the same target".
+    Then call search_observations with the group's time and point to get each observation's field,
+    archive link and images."""
+    return observations.coordinated(start, end, facilities, max_results)
 
 
 @tool(mcp, "Find alignments, quadratures, conjunctions and connections")

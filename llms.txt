@@ -17,9 +17,12 @@ Install and run with one command: `uvx heliofleet-mcp` (MCP server), or `uvx hel
 
 - `align A [B] --kind radial|quadrature|conjunction|connection --tol DEG --after T [--before T] [--next]` (find_alignments): alignment windows with start, end, best time and value, and a link that reruns the search.
 - `position BODY --time T` (get_position): distance, Stonyhurst and Carrington coordinates, ecliptic and HEE vectors, angle from Earth, light time, Parker-spiral footpoint.
+- `trajectory BODY --after T --before T --step H` (get_trajectory): the same columns sampled over a date range, with the closest and farthest points.
 - `fleet --time T` (get_fleet_state): the same for every spacecraft and planet.
 - `events [--kind K] [--body B] [--space-weather]` (list_upcoming_events): perihelia, alignments, quadratures, conjunctions, eclipses; optionally DONKI flares, CMEs and storms.
 - `geometry OBSERVER --time T` (get_viewing_geometry): light time, RSUN_OBS, B0, HGLN_OBS, CRLN_OBS, km per arcsec.
+- `observations --after T [--before T] [--instruments iris,dkist] [--at X Y --radius R]` (search_observations): IRIS, Hinode/EIS, DKIST, Solar Orbiter and rocket datasets with their fields of view seen from Earth, archive links and SDO image cutouts.
+- `coordinated --after T [--facilities dkist,iris]` (find_coordinated_observations): overlapping observations by different facilities.
 - `link --time T [--page sky --observer B]` (build_heliofleet_link)
 - `connection BODY [--wind V]` (get_magnetic_connection): HelioField PFSS footpoint, expansion factor, coronal-hole distance, WSA-type speed.
 - `spaceweather [--date D]` (get_space_weather), `field [--date D]` (get_coronal_field), `status` (get_data_status).

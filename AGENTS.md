@@ -16,6 +16,8 @@ the Sun. It covers using this repository to answer such questions and working on
    uvx heliofleet-mcp align psp solo --tol 10 --after 2026-11-19 --next
    uvx heliofleet-mcp position "Solar Orbiter" --time 2026-11-19T12:00Z
    uvx heliofleet-mcp geometry psp --time 2025-03-22T22:25Z
+   uvx heliofleet-mcp trajectory psp --after 2025-03-20 --before 2025-03-25 --step 6
+   uvx heliofleet-mcp observations --after 2024-03-01 --instruments iris,dkist
    uvx heliofleet-mcp events --kind perihelion,alignment,quadrature
    uvx heliofleet-mcp connection psp --wind 450
    uvx heliofleet-mcp spaceweather
@@ -51,10 +53,13 @@ To install these instructions as a reusable skill, use
 | Question | Command | MCP tool |
 | --- | --- | --- |
 | Where is a spacecraft or planet? | `position BODY --time T` | `get_position` |
+| How does a body's position change over a date range? | `trajectory BODY --after T --before T --step H` | `get_trajectory` |
 | Where is everything? | `fleet --time T` | `get_fleet_state` |
 | When are two bodies aligned, or one in quadrature or conjunction? | `align A [B] --kind K --tol DEG --after T [--before T] [--next]` | `find_alignments` |
 | What is coming up (perihelia, alignments, eclipses)? | `events [--kind ...] [--body B]` | `list_upcoming_events` |
 | What does an observer see of the Sun (B0, L0, solar radius, light time)? | `geometry OBSERVER --time T` | `get_viewing_geometry` |
+| Which IRIS, EIS, DKIST, Solar Orbiter or rocket datasets exist for a time or a spot? | `observations --after T [--instruments I] [--at X Y]` | `search_observations` |
+| When did different facilities observe the same target? | `coordinated --after T [--facilities F]` | `find_coordinated_observations` |
 | A link to show the user | `link --time T [--page sky --observer B]` | `build_heliofleet_link` |
 | Where does a spacecraft connect to the Sun? | `connection BODY [--wind V]` | `get_magnetic_connection` |
 | Solar-wind and sector outlook at Earth | `spaceweather [--date D]` | `get_space_weather` |

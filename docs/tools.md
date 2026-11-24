@@ -13,10 +13,13 @@ HelioField; give it to the user with the numbers. The Python methods behind the 
 | Tool | What it returns |
 | --- | --- |
 | `get_position(body, time)` | Distance from the Sun; Stonyhurst lon/lat; Carrington longitude seen from Earth; ecliptic J2000 and HEE vectors; angle from Earth and distance to Earth; light time; Parker-spiral footpoint |
+| `get_trajectory(body, start, end, step_hours)` | One body's coordinates sampled over a date range (up to 2000 samples) as a table with the same columns as `get_position`, plus the closest and farthest points from the Sun and the closest approach to Earth |
 | `get_fleet_state(time)` | The same columns for Earth, every spacecraft on the map, and optionally Mercury, Venus and Mars |
 | `find_alignments(kind, a, b, tolerance_deg, start, end)` | Windows of `radial` alignment, `quadrature` with Earth, solar `conjunction` or magnetic `connection`, each with start, end, best time and value, and a link that reruns the search |
 | `list_upcoming_events(start, end)` | HelioFleet's calendar: perihelia, alignments, quadratures, conjunctions and eclipses; optionally DONKI flares, CMEs and storms |
 | `get_viewing_geometry(observer, time)` | Light time and offset from Earth, RSUN_OBS, B0, HGLN_OBS, L0 (CRLN_OBS), km per arcsec and scale relative to Earth, with a sky-view link |
+| `search_observations(start, end, instruments, x_arcsec, y_arcsec)` | IRIS, Hinode/EIS, DKIST, Solar Orbiter (EUI-HRI, PHI-HRT, SPICE), Hi-C and CLASP observations in a time range, optionally covering a point on the disk: dataset id, times, programme, field of view in Earth's helioprojective frame (centre, size, polygon), archive link, and SDO AIA 171, AIA 193 and HMI PNG cutouts around the field |
+| `find_coordinated_observations(start, end, facilities)` | Groups of observations by different facilities that overlap in time and on the Sun: start, duration, shared point, facilities and counts, with a sky-view link |
 | `build_heliofleet_link(...)` | A map or sky-view URL for a time, frame, zoom, hidden bodies, surface spot, tab or alignment search |
 | `get_data_status()` | Which data release is loaded, where it came from, and each body's span |
 

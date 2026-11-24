@@ -27,6 +27,10 @@ ALIGN_KINDS = {
                    "help": "Parker-spiral footpoints of both bodies within the tolerance in longitude."},
 }
 MAX_RANGE_DAYS = 3660
+MAX_SAMPLES = 2000
+TRAJECTORY_COLUMNS = ["time_utc", "status", "r_au", "hgs_lon_deg", "hgs_lat_deg", "carrington_lon_deg",
+                      "hee_x_au", "hee_y_au", "hee_z_au", "sep_from_earth_deg", "dist_to_earth_au",
+                      "light_time_s", "footpoint_hgs_lon_deg"]
 
 
 def _r(v, d):
@@ -318,6 +322,87 @@ class Fleet:
             "not_shown": missing,
             "link": map_link(jd, wind=wind if wind != 400 else None, planets=include_planets),
             "data": self.data_info(),
+        }
+
+    def trajectory(self, body, start=None, end=None, step_hours=24.0, wind=400.0):
+        """One body's coordinates sampled over a time range (the ``get_trajectory`` tool).
+
+        Parameters
+        ----------
+        body : str
+            Body key or name.
+        start, end : str or float, optional
+            UTC range. Default: now to 30 days later.
+        step_hours : float, optional
+            Sampling step in hours (default 24). At most ``MAX_SAMPLES`` samples.
+        wind : float, optional
+            Solar-wind speed for the Parker-spiral footpoint (km/s).
+
+        Returns
+        -------
+        dict
+            ``body``, ``name``, ``range_utc``, ``step_hours``, ``columns``, ``rows`` (one list per
+            sample, in the order of ``columns``; coordinates are null when the body has no position),
+            ``extremes`` (closest and farthest from the Sun, closest to Earth), ``frame_notes`` and
+            a map ``link`` with the orbit trail over the range.
+
+        Raises
+        ------
+        ValueError
+            For an unknown body, an end before the start, or too many samples.
+
+        Examples
+        --------
+        >>> tr = Fleet().trajectory("psp", "2025-03-20", "2025-03-25", step_hours=12)
+        >>> len(tr["rows"]), tr["extremes"]["closest_to_sun"]["time_utc"][:10]
+        (11, '2025-03-23')
+        """
+        key = resolve(body)
+        jd0 = parse_time(start)
+        jd1 = parse_time(end) if end is not None else jd0 + 30
+        step = float(step_hours) / 24
+        if jd1 < jd0:
+            raise ValueError("end is before start")
+        if step <= 0:
+            raise ValueError("step_hours must be positive")
+        n = int(math.floor((jd1 - jd0) / step + 1e-9)) + 1
+        if n > MAX_SAMPLES:
+            raise ValueError(f"{n} samples requested; at most {MAX_SAMPLES}. Use a larger step_hours "
+                             f"(at least {math.ceil((jd1 - jd0) * 24 / (MAX_SAMPLES - 1) * 10) / 10} h).")
+        planet = BODIES[key]["kind"] == "planet" and key != "earth"
+        cols = TRAJECTORY_COLUMNS if not planet else TRAJECTORY_COLUMNS[:-1]
+        rows = []
+        for i in range(n):
+            jd = jd0 + i * step
+            earth = self.earth(jd)
+            if earth is None:
+                rows.append([iso(jd), "nodata"] + [None] * (len(cols) - 2))
+                continue
+            r = self.body_row(key, jd, earth, wind)
+            hee = r.get("hee_au") or [None, None, None]
+            vals = {**r, "hee_x_au": hee[0], "hee_y_au": hee[1], "hee_z_au": hee[2]}
+            rows.append([vals.get(c) for c in cols])
+        ok = [dict(zip(cols, r)) for r in rows if r[2] is not None]
+
+        def pick(rows_, col, fn):
+            if not rows_:
+                return None
+            r = fn(rows_, key=lambda x: x[col])
+            return {"time_utc": r["time_utc"], col: r[col]}
+
+        extremes = {"closest_to_sun": pick(ok, "r_au", min), "farthest_from_sun": pick(ok, "r_au", max)}
+        if key != "earth":
+            extremes["closest_to_earth"] = pick(ok, "dist_to_earth_au", min)
+        days = jd1 - jd0
+        return {
+            "body": key, "name": BODIES[key]["name"],
+            "range_utc": [iso(jd0), iso(jd1)], "step_hours": float(step_hours), "solar_wind_km_s": wind,
+            "columns": cols, "rows": rows, "extremes": extremes,
+            "frame_notes": {**FRAME_NOTES, "hee_x_au / hee_y_au / hee_z_au": FRAME_NOTES["hee_au"]},
+            "note": None if len(ok) == len(rows) else
+            "Rows with null coordinates fall outside the body's ephemeris (see the status column).",
+            "link": map_link(jd1, tab="series", trail=min(365, max(1, round(days))) if days >= 1 else None,
+                             wind=wind if wind != 400 else None),
         }
 
     # ---------- viewing geometry (js/tools.js geometryRows) ----------

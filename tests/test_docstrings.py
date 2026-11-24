@@ -11,7 +11,7 @@ import inspect
 
 import pytest
 
-MODULES = ["frames", "timeutil", "catalog", "links", "data", "geometry", "heliofield", "cli"]
+MODULES = ["frames", "timeutil", "catalog", "links", "data", "geometry", "observations", "heliofield", "cli"]
 
 
 def _public(mod):

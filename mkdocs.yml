@@ -110,6 +110,7 @@ nav:
   - API reference:
       - api/index.md
       - Fleet (geometry): api/geometry.md
+      - Observations: api/observations.md
       - HelioField: api/heliofield.md
       - Data sources: api/data.md
       - Frames: api/frames.md

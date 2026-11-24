@@ -28,8 +28,8 @@ Every answer comes with a link that opens the same moment on
 
     ---
 
-    Eleven tools for any Model Context Protocol client: positions, alignments, viewing geometry,
-    events, magnetic connectivity and links.
+    Fourteen tools for any Model Context Protocol client: positions, trajectories, alignments,
+    viewing geometry, observation search, events, magnetic connectivity and links.
 
     [:octicons-arrow-right-24: MCP tools](tools.md)
 
